@@ -61,6 +61,20 @@ KEY_FILES = [
 
 DEFAULT_MAX_FILE_LENGTH = 12000  # Default truncation limit
 
+# Standard endpoint checklist
+NEW_ENDPOINT_CHECKLIST = """## Adding a new endpoint (checklist)
+
+Standard wiring pattern used in this project:
+
+1. Add Flask route (`@app.route("/api/endpoint", methods=["POST"])`)
+2. Parse request fields (`request.form.get()`, `request.files.get()`)
+3. Create `job_id` and `JOBS` queue (`JOBS.set(job_id, {'queue': queue.Queue()})`)
+4. Spawn worker thread (`threading.Thread(target=process_job, args=(...))`)
+5. Stream via `/api/stream/<job_id>` (worker calls `q.put()` with progress/complete/error)
+6. Serve result via `/output/<path:filename>` (static file serving route)
+7. Update UI to call endpoint and listen to stream (EventSource pattern)
+"""
+
 
 def should_exclude(path: Path, exclude_folders: Set[str], exclude_extensions: Set[str]) -> bool:
     """Check if a path should be excluded."""
@@ -422,36 +436,51 @@ def read_file_content(file_path: Path, project_root: Path, max_length: int = DEF
 
 def extract_html_js_excerpt(html_content: str) -> str:
     """
-    Extract JavaScript code (script tags) and key HTML elements (IDs/classes used by JS)
+    Extract JavaScript code (inline script tags only) and key HTML elements (IDs referenced by JS)
     from templates/index.html for the snapshot.
     
-    Returns a formatted excerpt containing all script tags and HTML elements with key IDs.
+    Returns a formatted excerpt containing:
+    - All inline <script>...</script> blocks (excludes external scripts with src)
+    - HTML elements with IDs referenced by JavaScript (renderBtn, dropzone, etc.)
     """
     import re
     output = []
-    output.append("<!-- JavaScript Excerpt (script tags and key HTML elements) -->")
+    output.append("<!-- JavaScript Excerpt (inline script tags and key HTML elements) -->")
     output.append("")
     
-    # Extract all script tags (including content)
-    script_pattern = r'<script[^>]*>.*?</script>'
+    # Extract ONLY inline script tags (exclude external scripts with src attribute)
+    # Pattern matches <script>...</script> but not <script src="...">
+    script_pattern = r'<script(?![^>]*\ssrc=)[^>]*>(.*?)</script>'
     scripts = re.findall(script_pattern, html_content, re.DOTALL | re.IGNORECASE)
     
     if scripts:
-        output.append("<!-- ========== JavaScript Code ========== -->")
+        output.append("<!-- ========== Inline JavaScript Code ========== -->")
         output.append("")
-        for i, script in enumerate(scripts, 1):
-            output.append(f"<!-- Script block {i} -->")
-            output.append(script)
+        for i, script_content in enumerate(scripts, 1):
+            # Wrap in script tags for readability
+            output.append(f"<!-- Inline script block {i} -->")
+            output.append("<script>")
+            output.append(script_content.strip())
+            output.append("</script>")
             output.append("")
     
-    # Key IDs that are referenced in JavaScript
+    # Key IDs that are referenced in JavaScript (prioritize those used by API handlers)
+    # These are the most critical for understanding the API integration
     key_ids = [
+        # Core render/stream controls
         'renderBtn', 'previewBtn', 'progressContainer', 'progressBar', 'status-console',
-        'dropzone', 'fileInput', 'estimate', 'selectedPreview', 'renderPreview',
+        # File handling
+        'dropzone', 'fileInput', 'selectedPreview', 'renderPreview',
+        # Mashup controls
         'mashupBtn', 'mashupStatus', 'mashupPreview', 'mashupResolution', 'mashupCost',
+        # Location/map
         'mapModal', 'openMapBtn', 'confirmLocBtn', 'location',
+        # Advanced options
         'use_sky_gradient', 'sky_col1', 'sky_col2', 'advanced_toggle', 'advanced_container',
-        'facade_gradient', 'facade_container', 'cost-period', 'costs-container',
+        'facade_gradient', 'facade_container',
+        # Cost tracking
+        'cost-period', 'costs-container', 'estimate',
+        # Batch queue
         'batch-queue', 'queue-items', 'pause-queue-btn', 'resume-queue-btn'
     ]
     
@@ -459,10 +488,11 @@ def extract_html_js_excerpt(html_content: str) -> str:
     output.append("")
     
     # Extract elements with these IDs using a more robust approach
-    for element_id in key_ids:
-        # Pattern to match opening tag with id attribute
-        id_pattern = rf'id=["\']?{re.escape(element_id)}["\']?'
-        # Find the position of the opening tag
+    # Sort IDs for deterministic output
+    for element_id in sorted(key_ids):
+        # Pattern to match opening tag with id attribute (handles various quote styles)
+        id_pattern = rf'\bid=["\']?{re.escape(element_id)}["\']?'
+        # Find the position of the id attribute
         matches = list(re.finditer(id_pattern, html_content, re.IGNORECASE))
         
         for match in matches:
@@ -485,8 +515,8 @@ def extract_html_js_excerpt(html_content: str) -> str:
             tag_name = tag_match.group(1)
             opening_tag = html_content[tag_start:tag_end+1]
             
-            # Check if it's a self-closing tag
-            if opening_tag.rstrip().endswith('/>') or tag_name.lower() in ['img', 'input', 'br', 'hr', 'meta', 'link']:
+            # Check if it's a self-closing tag or void element
+            if opening_tag.rstrip().endswith('/>') or tag_name.lower() in ['img', 'input', 'br', 'hr', 'meta', 'link', 'area', 'base', 'col', 'embed', 'source', 'track', 'wbr']:
                 output.append(f"<!-- Element with id='{element_id}' -->")
                 output.append(opening_tag)
                 output.append("")
@@ -497,7 +527,9 @@ def extract_html_js_excerpt(html_content: str) -> str:
                 closing_match = re.search(closing_pattern, remaining, re.IGNORECASE)
                 
                 if closing_match:
-                    full_element = html_content[tag_start:tag_end+1+closing_match.end()]
+                    # Include the full element including closing tag
+                    closing_end = tag_end + 1 + closing_match.end()
+                    full_element = html_content[tag_start:closing_end]
                     output.append(f"<!-- Element with id='{element_id}' -->")
                     output.append(full_element)
                     output.append("")
@@ -599,6 +631,10 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
     sections.append("- **For new controls:** paste Options Schema")
     sections.append("")
     
+    # === Adding a new endpoint checklist ===
+    sections.append(NEW_ENDPOINT_CHECKLIST.strip())
+    sections.append("")
+    
     # === Build Identity ===
     sections.append("## Build Identity")
     sections.append("")
@@ -694,9 +730,19 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
     sections.append('{"type": "complete", "data": {"status": "success", "images": [...], "total_cost_usd": 0.20, "settings": {...}}}')
     sections.append("```")
     sections.append("")
-    sections.append("Refine/Inpaint/Preview completion:")
+    sections.append("Refine job completion:")
+    sections.append("```json")
+    sections.append('{"type": "complete", "data": {"status": "success", "image": "/output/path.jpg", "cost_usd": 0.05, "original_job_id": "..."}}')
+    sections.append("```")
+    sections.append("")
+    sections.append("Inpaint job completion:")
     sections.append("```json")
     sections.append('{"type": "complete", "data": {"status": "success", "image": "/output/path.jpg", "cost_usd": 0.05}}')
+    sections.append("```")
+    sections.append("")
+    sections.append("Preview job completion:")
+    sections.append("```json")
+    sections.append('{"type": "complete", "data": {"status": "success", "preview_path": "/output/preview.jpg", "message": "Preview generated. Use this to decide if you want to generate full resolution."}}')
     sections.append("```")
     sections.append("")
     sections.append("**Client behavior**: Render results (images/data), stop polling/stream, close EventSource.")
@@ -709,11 +755,37 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
     sections.append("")
     sections.append("**Client behavior**: Display error message, stop polling/stream, close EventSource.")
     sections.append("")
+    sections.append("### Client Recipe (EventSource)")
+    sections.append("")
+    sections.append("```javascript")
+    sections.append("const evtSource = new EventSource(`/api/stream/${jobId}`);")
+    sections.append("")
+    sections.append("evtSource.onmessage = function(e) {")
+    sections.append("  // Ignore keepalive comments")
+    sections.append("  if (e.data === ': keepalive') return;")
+    sections.append("  ")
+    sections.append("  const msg = JSON.parse(e.data);")
+    sections.append("  ")
+    sections.append("  if (msg.type === 'progress') {")
+    sections.append("    // Update UI with progress message")
+    sections.append("    updateStatus(msg.message);")
+    sections.append("  } else if (msg.type === 'complete') {")
+    sections.append("    // Handle completion (render results, etc.)")
+    sections.append("    handleCompletion(msg.data);")
+    sections.append("    evtSource.close();  // Close stream")
+    sections.append("  } else if (msg.type === 'error') {")
+    sections.append("    // Handle error")
+    sections.append("    showError(msg.message);")
+    sections.append("    evtSource.close();  // Close stream")
+    sections.append("  }")
+    sections.append("};")
+    sections.append("```")
+    sections.append("")
     sections.append("### Notes")
     sections.append("")
-    sections.append("- Stream closes automatically after `complete` or `error` events.")
-    sections.append("- Keepalive comments (`: keepalive`) are sent every 30s to maintain connection.")
-    sections.append("- Job queue expires after 1 hour (TTL).")
+    sections.append("- **Stream closure**: The stream closes automatically when a `complete` or `error` event is received (the `generate()` function breaks from the loop).")
+    sections.append("- **Keepalive**: If no message arrives within 30 seconds, a keepalive comment (`: keepalive`) is sent to maintain the connection. The queue blocks for up to 30s waiting for messages.")
+    sections.append("- **TTL expiration**: Jobs expire after 1 hour (3600 seconds). If a job expires, `JOBS.get(job_id)` returns `None`, and the stream sends an error message (`'Job not found or expired'`) and closes.")
     sections.append("")
     
     # === Static File Serving ===
@@ -727,8 +799,8 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
     sections.append("| `/output/<path:filename>` | `output/` (output folder) | Generated result images displayed in the UI |")
     sections.append("")
     sections.append("**Usage notes:**")
-    sections.append("- `/input/` serves original uploaded images (stored in `UPLOAD_FOLDER`).")
-    sections.append("- `/output/` serves generated/processed images (stored in `OUTPUT_FOLDER`).")
+    sections.append("- `/input/` serves original uploaded images (stored in `UPLOAD_FOLDER`), used in comparison sliders.")
+    sections.append("- `/output/` serves generated media (images, and future videos). The UI should treat this as the canonical public path for all generated content (stored in `OUTPUT_FOLDER`).")
     sections.append("")
     
     # === Options Schema ===

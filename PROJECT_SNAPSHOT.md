@@ -6,9 +6,21 @@
 - **For backend changes:** paste API Inventory + the relevant route excerpt
 - **For new controls:** paste Options Schema
 
+## Adding a new endpoint (checklist)
+
+Standard wiring pattern used in this project:
+
+1. Add Flask route (`@app.route("/api/endpoint", methods=["POST"])`)
+2. Parse request fields (`request.form.get()`, `request.files.get()`)
+3. Create `job_id` and `JOBS` queue (`JOBS.set(job_id, {'queue': queue.Queue()})`)
+4. Spawn worker thread (`threading.Thread(target=process_job, args=(...))`)
+5. Stream via `/api/stream/<job_id>` (worker calls `q.put()` with progress/complete/error)
+6. Serve result via `/output/<path:filename>` (static file serving route)
+7. Update UI to call endpoint and listen to stream (EventSource pattern)
+
 ## Build Identity
 
-**Generated (Timestamp):** 2025-12-30 13:48:28
+**Generated (Timestamp):** 2025-12-30 14:08:48
 **Source Path:** <REPO_ROOT>
 
 ## Repo Tree
@@ -203,9 +215,19 @@ Render job completion:
 {"type": "complete", "data": {"status": "success", "images": [...], "total_cost_usd": 0.20, "settings": {...}}}
 ```
 
-Refine/Inpaint/Preview completion:
+Refine job completion:
+```json
+{"type": "complete", "data": {"status": "success", "image": "/output/path.jpg", "cost_usd": 0.05, "original_job_id": "..."}}
+```
+
+Inpaint job completion:
 ```json
 {"type": "complete", "data": {"status": "success", "image": "/output/path.jpg", "cost_usd": 0.05}}
+```
+
+Preview job completion:
+```json
+{"type": "complete", "data": {"status": "success", "preview_path": "/output/preview.jpg", "message": "Preview generated. Use this to decide if you want to generate full resolution."}}
 ```
 
 **Client behavior**: Render results (images/data), stop polling/stream, close EventSource.
@@ -218,11 +240,37 @@ Refine/Inpaint/Preview completion:
 
 **Client behavior**: Display error message, stop polling/stream, close EventSource.
 
+### Client Recipe (EventSource)
+
+```javascript
+const evtSource = new EventSource(`/api/stream/${jobId}`);
+
+evtSource.onmessage = function(e) {
+  // Ignore keepalive comments
+  if (e.data === ': keepalive') return;
+  
+  const msg = JSON.parse(e.data);
+  
+  if (msg.type === 'progress') {
+    // Update UI with progress message
+    updateStatus(msg.message);
+  } else if (msg.type === 'complete') {
+    // Handle completion (render results, etc.)
+    handleCompletion(msg.data);
+    evtSource.close();  // Close stream
+  } else if (msg.type === 'error') {
+    // Handle error
+    showError(msg.message);
+    evtSource.close();  // Close stream
+  }
+};
+```
+
 ### Notes
 
-- Stream closes automatically after `complete` or `error` events.
-- Keepalive comments (`: keepalive`) are sent every 30s to maintain connection.
-- Job queue expires after 1 hour (TTL).
+- **Stream closure**: The stream closes automatically when a `complete` or `error` event is received (the `generate()` function breaks from the loop).
+- **Keepalive**: If no message arrives within 30 seconds, a keepalive comment (`: keepalive`) is sent to maintain the connection. The queue blocks for up to 30s waiting for messages.
+- **TTL expiration**: Jobs expire after 1 hour (3600 seconds). If a job expires, `JOBS.get(job_id)` returns `None`, and the stream sends an error message (`'Job not found or expired'`) and closes.
 
 ## Static File Serving (Inputs/Outputs)
 
@@ -234,8 +282,8 @@ Refine/Inpaint/Preview completion:
 | `/output/<path:filename>` | `output/` (output folder) | Generated result images displayed in the UI |
 
 **Usage notes:**
-- `/input/` serves original uploaded images (stored in `UPLOAD_FOLDER`).
-- `/output/` serves generated/processed images (stored in `OUTPUT_FOLDER`).
+- `/input/` serves original uploaded images (stored in `UPLOAD_FOLDER`), used in comparison sliders.
+- `/output/` serves generated media (images, and future videos). The UI should treat this as the canonical public path for all generated content (stored in `OUTPUT_FOLDER`).
 
 ## Options Schema
 
@@ -996,22 +1044,13 @@ google-genai>=1.0.0
 ### templates/index.html (JS excerpt)
 
 ```html
-<!-- JavaScript Excerpt (script tags and key HTML elements) -->
+<!-- JavaScript Excerpt (inline script tags and key HTML elements) -->
 
-<!-- ========== JavaScript Code ========== -->
+<!-- ========== Inline JavaScript Code ========== -->
 
-<!-- Script block 1 -->
-<script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
-
-<!-- Script block 2 -->
-<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" 
-            crossorigin="anonymous"
-            onerror="loadLeafletFallback();"
-            onload="window.leafletLoaded = true;"></script>
-
-<!-- Script block 3 -->
+<!-- Inline script block 1 -->
 <script>
-        // Fallback loader if primary CDN fails
+// Fallback loader if primary CDN fails
         function loadLeafletFallback() {
             console.warn('Primary Leaflet CDN (jsdelivr) failed, trying fallback (unpkg)...');
             if (window.leafletLoadAttempted) {
@@ -1051,11 +1090,11 @@ google-genai>=1.0.0
                 }
             }, 1000);
         });
-    </script>
+</script>
 
-<!-- Script block 4 -->
+<!-- Inline script block 2 -->
 <script>
-        const dropzone = document.getElementById("dropzone");
+const dropzone = document.getElementById("dropzone");
         const fileInput = document.getElementById("fileInput");
         const estimateEl = document.getElementById("estimate");
         const selectedPreview = document.getElementById("selectedPreview");
@@ -1651,9 +1690,17 @@ google-genai>=1.0.0
                 
                 // Update canvas display size on window resize
                 const resizeObserver = new ResizeObserver(() => {
-                    updateCanvasDisplayS
+                    updateCanvasDisplaySize();
+                });
+                resizeObserver.observe(canvasContainer);
 
-[TRUNCATED - Excerpt was 132872 characters, showing first 30,000 characters]
+                function getEventPos(e) {
+                    const rect = maskCanvas.getBoundingClientRect();
+                    const scaleX = maskCanvas.width / rect.width;
+                    const scaleY = maskCanvas.height / rect.height;
+                    cons
+
+[TRUNCATED - Excerpt was 132513 characters, showing first 30,000 characters]
 ```
 
 ### .env
