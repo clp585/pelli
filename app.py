@@ -15,7 +15,7 @@ from werkzeug.utils import secure_filename
 
 # Removed 'analyze_render' from imports
 # ADDED refine_render and inpaint_render to imports
-from agent_tools import run_nano_variant, run_mashup_variant, refine_render, inpaint_render, format_error_response
+from agent_tools import run_nano_variant, run_mashup_variant, refine_render, inpaint_render, generate_veo_video, format_error_response
 from agent_tools.cache import TTLCache
 from agent_tools.storage import (
     add_to_gallery, get_gallery, get_gallery_entry, delete_gallery_entry,
@@ -531,6 +531,100 @@ def process_inpaint_job(new_job_id, image_path, mask_path, prompt, edit_mode, re
     except Exception as e:
         from agent_tools.errors import get_user_friendly_error
         q.put({"type": "error", "message": get_user_friendly_error(e)})
+
+
+# ---------- Video Generation Worker ----------
+def process_video_job(job_id, image_path, options):
+    """Worker for video generation jobs"""
+    job_data = JOBS.get(job_id)
+    if not job_data:
+        return  # Job expired or doesn't exist
+    q = job_data['queue']
+    
+    def update_status(msg):
+        q.put({"type": "progress", "message": msg})
+    
+    try:
+        # Extract video options
+        shot_preset = options.get('shot_preset', 'zoom_in')
+        duration_s = options.get('duration_s', 5)
+        fps = options.get('fps', 30)
+        aspect = options.get('aspect', '16:9')
+        output_folder = options.get('base_output_folder', OUTPUT_FOLDER)
+        
+        # Call the video generation function
+        video_path, cost_usd = generate_veo_video(
+            image_path=image_path,
+            shot_preset=shot_preset,
+            duration_s=duration_s,
+            fps=fps,
+            aspect=aspect,
+            output_folder=output_folder,
+            status_callback=update_status,
+            job_id=job_id,
+        )
+        
+        # Send completion message
+        q.put({
+            "type": "complete",
+            "data": {
+                "status": "success",
+                "video": video_path,
+                "cost_usd": cost_usd,
+                "settings": options
+            }
+        })
+    except Exception as e:
+        from agent_tools.errors import get_user_friendly_error
+        q.put({"type": "error", "message": get_user_friendly_error(e)})
+
+
+@app.route("/api/video", methods=["POST"])
+def video_api():
+    """Endpoint for generating videos from images using Veo 3."""
+    # Check if request has image file
+    if 'image' not in request.files:
+        return jsonify({"status": "error", "message": "Missing image file"}), 400
+    
+    image_file = request.files['image']
+    if not image_file.filename:
+        return jsonify({"status": "error", "message": "No file selected"}), 400
+    
+    if not allowed_file(image_file.filename):
+        return jsonify({"status": "error", "message": "Invalid file type"}), 400
+    
+    # Save uploaded file
+    image_filename = secure_filename(image_file.filename)
+    image_path = os.path.join(UPLOAD_FOLDER, f"veo_{uuid.uuid4().hex[:8]}_{image_filename}")
+    image_file.save(image_path)
+    
+    # Parse form fields with defaults
+    shot_preset = request.form.get("shot_preset", "cinematic_orbit")
+    duration_s = int(request.form.get("duration_s", 5))
+    fps = int(request.form.get("fps", 24))
+    aspect = request.form.get("aspect", "16:9")
+    
+    # Build options dict
+    options = {
+        "shot_preset": shot_preset,
+        "duration_s": duration_s,
+        "fps": fps,
+        "aspect": aspect,
+        "base_output_folder": OUTPUT_FOLDER,
+    }
+    
+    # Create a new job for the video generation process
+    job_id = str(uuid.uuid4())
+    JOBS.set(job_id, {'queue': queue.Queue()})
+    
+    thread = threading.Thread(
+        target=process_video_job,
+        args=(job_id, image_path, options)
+    )
+    thread.daemon = True
+    thread.start()
+    
+    return jsonify({"status": "started", "job_id": job_id})
 
 
 @app.route("/api/inpaint", methods=["POST"])

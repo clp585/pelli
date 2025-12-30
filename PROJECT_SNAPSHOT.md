@@ -20,7 +20,7 @@ Standard wiring pattern used in this project:
 
 ## Build Identity
 
-**Generated (Timestamp):** 2025-12-30 14:08:48
+**Generated (Timestamp):** 2025-12-30 14:36:21
 **Source Path:** <REPO_ROOT>
 
 ## Repo Tree
@@ -41,7 +41,8 @@ Standard wiring pattern used in this project:
 │   ├── render.py
 │   ├── retry.py
 │   ├── storage.py
-│   └── validation.py
+│   ├── validation.py
+│   └── video.py
 ├── backend/
 │   ├── agent_registry.py
 │   ├── main.py
@@ -153,6 +154,7 @@ Standard wiring pattern used in this project:
 | `/api/refine` | POST | `refine_api` |
 | `/api/render` | POST | `render_api` |
 | `/api/stream/<job_id>` | GET | `stream_status` |
+| `/api/video` | POST | `video_api` |
 | `/health` | GET | `health` |
 | `/input/<path:filename>` | GET | `serve_input` |
 | `/output/<path:filename>` | GET | `serve_output` |
@@ -342,7 +344,7 @@ from werkzeug.utils import secure_filename
 
 # Removed 'analyze_render' from imports
 # ADDED refine_render and inpaint_render to imports
-from agent_tools import run_nano_variant, run_mashup_variant, refine_render, inpaint_render, format_error_response
+from agent_tools import run_nano_variant, run_mashup_variant, refine_render, inpaint_render, generate_veo_video, format_error_response
 from agent_tools.cache import TTLCache
 from agent_tools.storage import (
     add_to_gallery, get_gallery, get_gallery_entry, delete_gallery_entry,
@@ -622,9 +624,9 @@ def process_refine_job(new_job_id, original_job_id, feedback):
                     job_id=new_job_id,
                     cost_usd=cost_usd,
                     resolution=original_entry.get("resolution", "4K"),
-                    style_name=o
+            
 
-[TRUNCATED - Original file was 38128 characters, showing first 12000 characters]
+[TRUNCATED - Original file was 41272 characters, showing first 12000 characters]
 ```
 
 *Note: File content truncated to 12,000 characters*
@@ -1378,6 +1380,129 @@ const dropzone = document.getElementById("dropzone");
             }
         });
 
+        // ========== Video (Veo 3) Handler ==========
+        const videoBtn = document.getElementById("videoBtn");
+        const videoFile = document.getElementById("videoFile");
+        const videoStatus = document.getElementById("videoStatus");
+        const videoResult = document.getElementById("videoResult");
+
+        videoBtn.addEventListener("click", async () => {
+            // Validate file selected
+            if (!videoFile.files || !videoFile.files[0]) {
+                videoStatus.style.display = "block";
+                videoStatus.style.backgroundColor = "#f8d7da";
+                videoStatus.style.color = "#721c24";
+                videoStatus.textContent = "Please select an image file first.";
+                return;
+            }
+
+            // Clear previous
+            videoStatus.innerHTML = "";
+            videoStatus.style.display = "block";
+            videoStatus.style.backgroundColor = "#d1ecf1";
+            videoStatus.style.color = "#0c5460";
+            videoStatus.textContent = "Initializing video generation...";
+            videoResult.innerHTML = "";
+
+            videoBtn.disabled = true;
+            videoBtn.innerHTML = '<i class="fa-solid fa-video"></i> Processing...';
+
+            try {
+                // Build FormData
+                const formData = new FormData();
+                formData.append("image", videoFile.files[0]);
+                formData.append("shot_preset", document.getElementById("videoShotPreset").value);
+                formData.append("duration_s", document.getElementById("videoDuration").value);
+                formData.append("fps", document.getElementById("videoFps").value);
+                formData.append("aspect", document.getElementById("videoAspect").value);
+
+                // Start job
+                const response = await fetch("/api/video", {
+                    method: "POST",
+                    body: formData,
+                });
+                const data = await response.json();
+
+                if (data.status === "started") {
+                    const jobId = data.job_id;
+                    videoStatus.textContent = `Job started. Job ID: ${jobId}`;
+
+                    // Open stream
+                    const evtSource = new EventSource(`/api/stream/${jobId}`);
+                    
+                    evtSource.onmessage = function(e) {
+                        // Ignore keepalives
+                        if (e.data === ": keepalive") return;
+
+                        const msg = JSON.parse(e.data);
+                        
+                        if (msg.type === "progress") {
+                            videoStatus.textContent = msg.message;
+                        } else if (msg.type === "complete") {
+                            evtSource.close();
+                            videoStatus.style.backgroundColor = "#d4edda";
+                            videoStatus.style.color = "#155724";
+                            let statusText = "Video generation complete!";
+                            if (msg.data && msg.data.cost_usd) {
+                                statusText += ` Cost: $${msg.data.cost_usd.toFixed(2)}`;
+                            }
+                            videoStatus.textContent = statusText;
+                            
+                            // Create clickable link to generated artifact
+                            if (msg.data && msg.data.video) {
+                                // Backend sends relative path like "output/xyz.txt" or absolute "/output/xyz.txt"
+                                // Handle both cases consistently with how images are handled
+                                let videoPath = msg.data.video;
+                                if (!videoPath.startsWith("/")) {
+                                    videoPath = "/" + videoPath;
+                                }
+                                
+                                // Create a link element
+                                const link = document.createElement("a");
+                                link.href = videoPath;
+                                link.target = "_blank";
+                                link.className = "btn-primary btn-primary-tertiary";
+                                link.innerHTML = '<i class="fa-solid fa-external-link"></i> Open generated artifact';
+                                videoResult.appendChild(link);
+                            }
+                            
+                            videoBtn.disabled = false;
+                            videoBtn.innerHTML = '<i class="fa-solid fa-video"></i> Generate Video';
+                        } else if (msg.type === "error") {
+                            evtSource.close();
+                            videoStatus.style.backgroundColor = "#f8d7da";
+                            videoStatus.style.color = "#721c24";
+                            videoStatus.textContent = "Error: " + msg.message;
+                            videoBtn.disabled = false;
+                            videoBtn.innerHTML = '<i class="fa-solid fa-video"></i> Generate Video';
+                        }
+                    };
+                    
+                    evtSource.onerror = function() {
+                        videoStatus.style.backgroundColor = "#f8d7da";
+                        videoStatus.style.color = "#721c24";
+                        videoStatus.textContent = "Connection lost.";
+                        evtSource.close();
+                        videoBtn.disabled = false;
+                        videoBtn.innerHTML = '<i class="fa-solid fa-video"></i> Generate Video';
+                    };
+                } else {
+                    videoStatus.style.backgroundColor = "#f8d7da";
+                    videoStatus.style.color = "#721c24";
+                    videoStatus.textContent = "Error starting job: " + (data.message || "Unknown error");
+                    videoBtn.disabled = false;
+                    videoBtn.innerHTML = '<i class="fa-solid fa-video"></i> Generate Video';
+                }
+
+            } catch (err) {
+                videoStatus.style.backgroundColor = "#f8d7da";
+                videoStatus.style.color = "#721c24";
+                videoStatus.textContent = "Error: " + err.message;
+                videoBtn.disabled = false;
+                videoBtn.innerHTML = '<i class="fa-solid fa-video"></i> Generate Video';
+            }
+        });
+
         // Function to display results (Slider, download, refine)
         // Batch Queue Management
         let batchQueue = [];
@@ -1559,148 +1684,9 @@ const dropzone = document.getElementById("dropzone");
                 canvasContainer.style.marginBottom = "10px";
                 canvasContainer.style.border = "2px solid var(--border-color)";
                 canvasContainer.style.borderRadius = "8px";
-                canvasContainer.style.overflow = "hidden";
-                canvasContainer.style.backgroundColor = "#000";
-                canvasContainer.id = `canvas-container-${jobId}`;
+                canvasContainer.s
 
-                // Preview image
-                const previewImg = document.createElement("img");
-                previewImg.src = "/" + imgData.image;
-                previewImg.style.width = "100%";
-                previewImg.style.height = "auto";
-                previewImg.style.display = "block";
-                previewImg.id = `preview-img-${jobId}`;
-                previewImg.onload = function() {
-                    const canvas = document.getElementById(`mask-canvas-${jobId}`);
-                    if (canvas) {
-                        canvas.width = this.naturalWidth;
-                        canvas.height = this.naturalHeight;
-                        canvas.style.width = "100%";
-                        canvas.style.height = "auto";
-                    }
-                };
-                canvasContainer.appendChild(previewImg);
-
-                // Canvas for drawing mask
-                const maskCanvas = document.createElement("canvas");
-                maskCanvas.id = `mask-canvas-${jobId}`;
-                maskCanvas.style.position = "absolute";
-                maskCanvas.style.top = "0";
-                maskCanvas.style.left = "0";
-                maskCanvas.style.width = "100%";
-                maskCanvas.style.height = "100%";
-                maskCanvas.style.cursor = "crosshair";
-                maskCanvas.style.opacity = "0.5";
-                canvasContainer.appendChild(maskCanvas);
-
-                // Drawing tools
-                const toolsDiv = document.createElement("div");
-                toolsDiv.className = "drawing-tools";
-
-                // Brush button
-                const brushBtn = document.createElement("button");
-                brushBtn.className = "btn-small";
-                brushBtn.innerHTML = '<i class="fa-solid fa-paintbrush"></i> Brush';
-                brushBtn.id = `brush-btn-${jobId}`;
-                brushBtn.style.backgroundColor = "#6366f1";
-                brushBtn.style.color = "white";
-                toolsDiv.appendChild(brushBtn);
-
-                // Eraser button
-                const eraserBtn = document.createElement("button");
-                eraserBtn.className = "btn-small";
-                eraserBtn.innerHTML = '<i class="fa-solid fa-eraser"></i> Eraser';
-                eraserBtn.id = `eraser-btn-${jobId}`;
-                toolsDiv.appendChild(eraserBtn);
-
-                // Clear button
-                const clearBtn = document.createElement("button");
-                clearBtn.className = "btn-small";
-                clearBtn.innerHTML = '<i class="fa-solid fa-trash"></i> Clear';
-                clearBtn.id = `clear-btn-${jobId}`;
-                toolsDiv.appendChild(clearBtn);
-
-                // Brush size slider
-                const sizeLabel = document.createElement("label");
-                sizeLabel.style.marginLeft = "10px";
-                sizeLabel.style.fontSize = "12px";
-                sizeLabel.innerHTML = 'Brush Size: <span id="brush-size-val-' + jobId + '">20</span>px';
-                toolsDiv.appendChild(sizeLabel);
-
-                const sizeSlider = document.createElement("input");
-                sizeSlider.type = "range";
-                sizeSlider.min = "5";
-                sizeSlider.max = "100";
-                sizeSlider.value = "20";
-                sizeSlider.style.width = "100px";
-                sizeSlider.id = `brush-size-${jobId}`;
-                sizeSlider.oninput = function() {
-                    document.getElementById(`brush-size-val-${jobId}`).textContent = this.value;
-                };
-                toolsDiv.appendChild(sizeSlider);
-
-                inpaintBox.appendChild(toolsDiv);
-                inpaintBox.appendChild(canvasContainer);
-
-                // Initialize canvas drawing
-                let isDrawing = false;
-                let currentTool = 'brush';
-                let brushSize = 20;
-
-                function initCanvas() {
-                    const img = previewImg;
-                    if (img.naturalWidth === 0 || img.naturalHeight === 0) {
-                        // Image not loaded yet, wait
-                        setTimeout(initCanvas, 100);
-                        return;
-                    }
-                    
-                    // Set canvas to match image dimensions
-                    maskCanvas.width = img.naturalWidth;
-                    maskCanvas.height = img.naturalHeight;
-                    
-                    // Set canvas display size to match image display size
-                    const imgRect = img.getBoundingClientRect();
-                    maskCanvas.style.width = imgRect.width + "px";
-                    maskCanvas.style.height = imgRect.height + "px";
-                    
-                    const ctx = maskCanvas.getContext('2d');
-                    ctx.fillStyle = 'white';
-                    ctx.strokeStyle = 'white';
-                    ctx.lineCap = 'round';
-                    ctx.lineJoin = 'round';
-                    ctx.globalCompositeOperation = 'source-over';
-                }
-
-                function updateCanvasDisplaySize() {
-                    if (maskCanvas.width === 0 || maskCanvas.height === 0) return;
-                    const imgRect = previewImg.getBoundingClientRect();
-                    maskCanvas.style.width = imgRect.width + "px";
-                    maskCanvas.style.height = imgRect.height + "px";
-                }
-
-                previewImg.onload = function() {
-                    initCanvas();
-                    updateCanvasDisplaySize();
-                };
-                if (previewImg.complete) {
-                    initCanvas();
-                    setTimeout(updateCanvasDisplaySize, 100);
-                }
-                
-                // Update canvas display size on window resize
-                const resizeObserver = new ResizeObserver(() => {
-                    updateCanvasDisplaySize();
-                });
-                resizeObserver.observe(canvasContainer);
-
-                function getEventPos(e) {
-                    const rect = maskCanvas.getBoundingClientRect();
-                    const scaleX = maskCanvas.width / rect.width;
-                    const scaleY = maskCanvas.height / rect.height;
-                    cons
-
-[TRUNCATED - Excerpt was 132513 characters, showing first 30,000 characters]
+[TRUNCATED - Excerpt was 138918 characters, showing first 30,000 characters]
 ```
 
 ### .env
