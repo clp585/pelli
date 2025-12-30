@@ -1,0 +1,6 @@
+VEO3 STUB
+image_path=input\veo_454a6664_test.png
+shot_preset=cinematic_orbit
+duration_s=5
+fps=24
+aspect=16:9

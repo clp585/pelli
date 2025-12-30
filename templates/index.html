@@ -1773,7 +1773,12 @@
                             if (msg.data && msg.data.video) {
                                 // Normalize path to ensure it starts with /
                                 const videoPath = normalizeOutputPath(msg.data.video);
-                                const artifactType = msg.data.artifact_type || 'file';
+                                // Use artifact_type if present, otherwise infer from file extension
+                                let artifactType = msg.data.artifact_type;
+                                if (!artifactType) {
+                                    // Fallback: infer from file extension (resilient during Option B transition)
+                                    artifactType = videoPath.toLowerCase().endsWith('.mp4') ? 'video' : 'file';
+                                }
                                 
                                 if (artifactType === 'video') {
                                     // Use dedicated video player element for .mp4 files

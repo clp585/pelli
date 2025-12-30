@@ -20,7 +20,7 @@ Standard wiring pattern used in this project:
 
 ## Build Identity
 
-**Generated (Timestamp):** 2025-12-30 15:13:38
+**Generated (Timestamp):** 2025-12-30 15:21:36
 **Source Path:** <REPO_ROOT>
 
 ## Repo Tree
@@ -234,7 +234,7 @@ Preview job completion:
 
 Video job completion:
 ```json
-{"type": "complete", "data": {"status": "success", "video": "/output/veo_stub_<id>.txt", "artifact_type": "file", "artifact_mime": "text/plain", "cost_usd": 0.10, "settings": {...}}}
+{"type": "complete", "data": {"status": "success", "video": "/output/veo_stub_<id>.txt", "cost_usd": 0.10, "settings": {...}, "artifact_type": "file", "artifact_mime": "text/plain"}}
 ```
 
 **Client behavior**: Render results (images/data), stop polling/stream, close EventSource.
@@ -631,7 +631,7 @@ def process_refine_job(new_job_id, original_job_id, feedback):
                     resolution=original_entry.get("resolution", "4K"),
             
 
-[TRUNCATED - Original file was 41582 characters, showing first 12000 characters]
+[TRUNCATED - Original file was 41820 characters, showing first 12000 characters]
 ```
 
 *Note: File content truncated to 12,000 characters*
@@ -1464,7 +1464,12 @@ const dropzone = document.getElementById("dropzone");
                             if (msg.data && msg.data.video) {
                                 // Normalize path to ensure it starts with /
                                 const videoPath = normalizeOutputPath(msg.data.video);
-                                const artifactType = msg.data.artifact_type || 'file';
+                                // Use artifact_type if present, otherwise infer from file extension
+                                let artifactType = msg.data.artifact_type;
+                                if (!artifactType) {
+                                    // Fallback: infer from file extension (resilient during Option B transition)
+                                    artifactType = videoPath.toLowerCase().endsWith('.mp4') ? 'video' : 'file';
+                                }
                                 
                                 if (artifactType === 'video') {
                                     // Use dedicated video player element for .mp4 files
@@ -1683,16 +1688,9 @@ const dropzone = document.getElementById("dropzone");
 
                 const inpaintLabel = document.createElement("label");
                 inpaintLabel.style.display = "block";
-                inpaintLabel.style.marginBottom = "5px";
-                inpaintLabel.style.fontWeight = "bold";
-                inpaintLabel.innerHTML = '<i class="fa-solid fa-paintbrush"></i> In-Paint (Draw Mask)';
-                inpaintBox.appendChild(inpaintLabel);
+                inp
 
-                const instructionText = document.createElement("p");
-                instructionText.style.fontSize = "12px";
-                instruc
-
-[TRUNCATED - Excerpt was 139684 characters, showing first 30,000 characters]
+[TRUNCATED - Excerpt was 140086 characters, showing first 30,000 characters]
 ```
 
 ### .env

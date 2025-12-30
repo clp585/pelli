@@ -553,7 +553,7 @@ def process_video_job(job_id, image_path, options):
         output_folder = options.get('base_output_folder', OUTPUT_FOLDER)
         
         # Call the video generation function
-        video_path, cost_usd = generate_veo_video(
+        video_filename, cost_usd = generate_veo_video(
             image_path=image_path,
             shot_preset=shot_preset,
             duration_s=duration_s,
@@ -564,8 +564,12 @@ def process_video_job(job_id, image_path, options):
             job_id=job_id,
         )
         
-        # Determine artifact type and MIME type
-        artifact_type = 'video' if video_path.endswith('.mp4') else 'file'
+        # Build public URL from filename (always /output/<filename>)
+        # This avoids OS path separator issues and keeps the contract clean.
+        video_url = f"/output/{video_filename}"
+        
+        # Determine artifact type and MIME type based on filename extension
+        artifact_type = 'video' if video_filename.endswith('.mp4') else 'file'
         artifact_mime = 'video/mp4' if artifact_type == 'video' else 'text/plain'
         
         # Send completion message
@@ -573,7 +577,7 @@ def process_video_job(job_id, image_path, options):
             "type": "complete",
             "data": {
                 "status": "success",
-                "video": video_path,
+                "video": video_url,
                 "cost_usd": cost_usd,
                 "settings": options,
                 "artifact_type": artifact_type,

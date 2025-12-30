@@ -30,7 +30,7 @@ def generate_veo_video(
     filename = f"veo_stub_{safe_job}.txt"
     
     # Create file system path for writing
-    fs_path = os.path.join(output_folder, filename).replace('\\\\','/')
+    fs_path = os.path.join(output_folder, filename)
     
     # Create a small placeholder artifact (text file) so /output serving works.
     with open(fs_path, "w", encoding="utf-8") as f:
@@ -41,9 +41,7 @@ def generate_veo_video(
         f.write(f"fps={fps}\n")
         f.write(f"aspect={aspect}\n")
 
-    # Return path in /output/<filename> format to match image contract style
-    out_path = f"/output/{filename}"
-    
-    # Return a tiny MVP cost (adjust later)
+    # Return just the filename (caller will build public URL as /output/<filename>)
+    # This avoids OS path separator issues and keeps the contract clean.
     cost_usd = 0.10
-    return out_path, cost_usd
+    return filename, cost_usd

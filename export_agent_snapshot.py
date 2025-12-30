@@ -747,7 +747,7 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
     sections.append("")
     sections.append("Video job completion:")
     sections.append("```json")
-    sections.append('{"type": "complete", "data": {"status": "success", "video": "/output/veo_stub_<id>.txt", "artifact_type": "file", "artifact_mime": "text/plain", "cost_usd": 0.10, "settings": {...}}}')
+    sections.append('{"type": "complete", "data": {"status": "success", "video": "/output/veo_stub_<id>.txt", "cost_usd": 0.10, "settings": {...}, "artifact_type": "file", "artifact_mime": "text/plain"}}')
     sections.append("```")
     sections.append("")
     sections.append("**Client behavior**: Render results (images/data), stop polling/stream, close EventSource.")
