@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+# Skip switch
+if [ "$SKIP_SNAPSHOT" = "1" ]; then
+  echo "[pre-commit] SKIP_SNAPSHOT=1 set; skipping snapshot generation."
+  exit 0
+fi
+
+echo "[pre-commit] Generating PROJECT_SNAPSHOT.md (fail-soft by default)..."
+
+# Run the PowerShell generator (works on Windows; on macOS/Linux this requires pwsh installed)
+set +e  # Temporarily disable exit on error to capture status for fail-soft behavior
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/precommit_snapshot.ps1
+STATUS=$?
+set -e  # Re-enable exit on error
+
+if [ $STATUS -ne 0 ]; then
+  if [ "$STRICT_SNAPSHOT" = "1" ]; then
+    echo "[pre-commit] ERROR: Snapshot generation failed and STRICT_SNAPSHOT=1; blocking commit."
+    exit $STATUS
+  fi
+  echo "[pre-commit] WARNING: Snapshot generation failed; allowing commit (fail-soft)."
+  exit 0
+fi
+
+# Stage snapshot if present (safe even if unchanged)
+git add PROJECT_SNAPSHOT.md || true
+
+echo "[pre-commit] Snapshot up to date."
+exit 0

@@ -1695,10 +1695,16 @@
         });
 
         // ========== Video (Veo 3) Handler ==========
+        function normalizeOutputPath(p) {
+            if (!p) return '';
+            return p.startsWith('/') ? p : '/' + p;
+        }
+        
         const videoBtn = document.getElementById("videoBtn");
         const videoFile = document.getElementById("videoFile");
         const videoStatus = document.getElementById("videoStatus");
         const videoResult = document.getElementById("videoResult");
+        const videoPlayer = document.getElementById("videoPlayer");
 
         videoBtn.addEventListener("click", async () => {
             // Validate file selected
@@ -1717,6 +1723,7 @@
             videoStatus.style.color = "#0c5460";
             videoStatus.textContent = "Initializing video generation...";
             videoResult.innerHTML = "";
+            videoPlayer.style.display = "none";
 
             videoBtn.disabled = true;
             videoBtn.innerHTML = '<i class="fa-solid fa-video"></i> Processing...';
@@ -1762,22 +1769,28 @@
                             }
                             videoStatus.textContent = statusText;
                             
-                            // Create clickable link to generated artifact
+                            // Render artifact based on type
                             if (msg.data && msg.data.video) {
-                                // Backend sends relative path like "output/xyz.txt" or absolute "/output/xyz.txt"
-                                // Handle both cases consistently with how images are handled
-                                let videoPath = msg.data.video;
-                                if (!videoPath.startsWith("/")) {
-                                    videoPath = "/" + videoPath;
-                                }
+                                // Normalize path to ensure it starts with /
+                                const videoPath = normalizeOutputPath(msg.data.video);
+                                const artifactType = msg.data.artifact_type || 'file';
                                 
-                                // Create a link element
-                                const link = document.createElement("a");
-                                link.href = videoPath;
-                                link.target = "_blank";
-                                link.className = "btn-primary btn-primary-tertiary";
-                                link.innerHTML = '<i class="fa-solid fa-external-link"></i> Open generated artifact';
-                                videoResult.appendChild(link);
+                                if (artifactType === 'video') {
+                                    // Use dedicated video player element for .mp4 files
+                                    videoPlayer.src = videoPath;
+                                    videoPlayer.style.display = "block";
+                                    videoResult.innerHTML = ""; // Hide/clear link container
+                                } else {
+                                    // Render download link for other file types (MVP: .txt stub)
+                                    videoPlayer.style.display = "none"; // Hide video player
+                                    const link = document.createElement("a");
+                                    link.href = videoPath;
+                                    link.target = "_blank";
+                                    link.className = "btn-primary btn-primary-tertiary";
+                                    link.innerHTML = '<i class="fa-solid fa-external-link"></i> Open generated artifact';
+                                    videoResult.innerHTML = ""; // Clear previous content
+                                    videoResult.appendChild(link);
+                                }
                             }
                             
                             videoBtn.disabled = false;

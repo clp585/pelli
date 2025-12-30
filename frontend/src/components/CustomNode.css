@@ -1,0 +1,239 @@
+.custom-node {
+  background: white;
+  border: 2px solid #94a3b8;
+  border-radius: 8px;
+  min-width: 200px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.custom-node.selected {
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+.node-header {
+  padding: 8px 12px;
+  border-radius: 6px 6px 0 0;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+}
+
+.node-title {
+  font-size: 14px;
+}
+
+.node-status {
+  font-size: 11px;
+  opacity: 0.9;
+  text-transform: uppercase;
+}
+
+.node-content {
+  padding: 12px;
+}
+
+.node-inputs,
+.node-outputs {
+  margin-bottom: 12px;
+}
+
+.node-outputs {
+  margin-bottom: 0;
+}
+
+.ports-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.port-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.port-row:last-child {
+  margin-bottom: 0;
+}
+
+.port-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.port-info:first-child {
+  margin-left: 0;
+}
+
+.node-outputs .port-info {
+  margin-right: 8px;
+  margin-left: 0;
+}
+
+.port-name {
+  font-size: 12px;
+  color: #1e293b;
+}
+
+.port-type {
+  font-size: 10px;
+  color: #64748b;
+  background: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.port-handle {
+  width: 12px;
+  height: 12px;
+  border: 2px solid white;
+  background: #64748b;
+}
+
+.node-result,
+.node-error {
+  padding: 8px 12px;
+  margin-top: 8px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 11px;
+}
+
+.result-label,
+.error-label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #64748b;
+}
+
+.result-content {
+  color: #1e293b;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.error-content {
+  color: #ef4444;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Embedded Controls Styles */
+.node-controls {
+  padding: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  margin-bottom: 12px;
+}
+
+.controls-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.node-control-item {
+  margin-bottom: 8px;
+}
+
+.node-control-item:last-child {
+  margin-bottom: 0;
+}
+
+.node-control-input,
+.node-control-select,
+.node-control-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.node-control-input label,
+.node-control-select label,
+.node-control-slider label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #475569;
+  text-transform: capitalize;
+}
+
+.node-control-input input[type="text"],
+.node-control-input input[type="number"],
+.node-control-select select {
+  padding: 4px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #1e293b;
+  background: white;
+}
+
+.node-control-input input[type="text"]:focus,
+.node-control-input input[type="number"]:focus,
+.node-control-select select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.node-control-slider input[type="range"] {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #cbd5e1;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.node-control-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+}
+
+.node-control-slider input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: none;
+}
+
+.node-control-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #1e293b;
+  cursor: pointer;
+}
+
+.node-control-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+

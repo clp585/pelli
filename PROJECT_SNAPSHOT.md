@@ -20,7 +20,7 @@ Standard wiring pattern used in this project:
 
 ## Build Identity
 
-**Generated (Timestamp):** 2025-12-30 14:36:21
+**Generated (Timestamp):** 2025-12-30 15:09:51
 **Source Path:** <REPO_ROOT>
 
 ## Repo Tree
@@ -230,6 +230,11 @@ Inpaint job completion:
 Preview job completion:
 ```json
 {"type": "complete", "data": {"status": "success", "preview_path": "/output/preview.jpg", "message": "Preview generated. Use this to decide if you want to generate full resolution."}}
+```
+
+Video job completion:
+```json
+{"type": "complete", "data": {"status": "success", "video": "/output/veo_stub_<id>.txt", "artifact_type": "file", "artifact_mime": "text/plain", "cost_usd": 0.10, "settings": {...}}}
 ```
 
 **Client behavior**: Render results (images/data), stop polling/stream, close EventSource.
@@ -626,7 +631,7 @@ def process_refine_job(new_job_id, original_job_id, feedback):
                     resolution=original_entry.get("resolution", "4K"),
             
 
-[TRUNCATED - Original file was 41272 characters, showing first 12000 characters]
+[TRUNCATED - Original file was 41582 characters, showing first 12000 characters]
 ```
 
 *Note: File content truncated to 12,000 characters*
@@ -1381,10 +1386,16 @@ const dropzone = document.getElementById("dropzone");
         });
 
         // ========== Video (Veo 3) Handler ==========
+        function normalizeOutputPath(p) {
+            if (!p) return '';
+            return p.startsWith('/') ? p : '/' + p;
+        }
+        
         const videoBtn = document.getElementById("videoBtn");
         const videoFile = document.getElementById("videoFile");
         const videoStatus = document.getElementById("videoStatus");
         const videoResult = document.getElementById("videoResult");
+        const videoPlayer = document.getElementById("videoPlayer");
 
         videoBtn.addEventListener("click", async () => {
             // Validate file selected
@@ -1403,6 +1414,7 @@ const dropzone = document.getElementById("dropzone");
             videoStatus.style.color = "#0c5460";
             videoStatus.textContent = "Initializing video generation...";
             videoResult.innerHTML = "";
+            videoPlayer.style.display = "none";
 
             videoBtn.disabled = true;
             videoBtn.innerHTML = '<i class="fa-solid fa-video"></i> Processing...';
@@ -1448,22 +1460,28 @@ const dropzone = document.getElementById("dropzone");
                             }
                             videoStatus.textContent = statusText;
                             
-                            // Create clickable link to generated artifact
+                            // Render artifact based on type
                             if (msg.data && msg.data.video) {
-                                // Backend sends relative path like "output/xyz.txt" or absolute "/output/xyz.txt"
-                                // Handle both cases consistently with how images are handled
-                                let videoPath = msg.data.video;
-                                if (!videoPath.startsWith("/")) {
-                                    videoPath = "/" + videoPath;
-                                }
+                                // Normalize path to ensure it starts with /
+                                const videoPath = normalizeOutputPath(msg.data.video);
+                                const artifactType = msg.data.artifact_type || 'file';
                                 
-                                // Create a link element
-                                const link = document.createElement("a");
-                                link.href = videoPath;
-                                link.target = "_blank";
-                                link.className = "btn-primary btn-primary-tertiary";
-                                link.innerHTML = '<i class="fa-solid fa-external-link"></i> Open generated artifact';
-                                videoResult.appendChild(link);
+                                if (artifactType === 'video') {
+                                    // Use dedicated video player element for .mp4 files
+                                    videoPlayer.src = videoPath;
+                                    videoPlayer.style.display = "block";
+                                    videoResult.innerHTML = ""; // Hide/clear link container
+                                } else {
+                                    // Render download link for other file types (MVP: .txt stub)
+                                    videoPlayer.style.display = "none"; // Hide video player
+                                    const link = document.createElement("a");
+                                    link.href = videoPath;
+                                    link.target = "_blank";
+                                    link.className = "btn-primary btn-primary-tertiary";
+                                    link.innerHTML = '<i class="fa-solid fa-external-link"></i> Open generated artifact';
+                                    videoResult.innerHTML = ""; // Clear previous content
+                                    videoResult.appendChild(link);
+                                }
                             }
                             
                             videoBtn.disabled = false;
@@ -1672,21 +1690,9 @@ const dropzone = document.getElementById("dropzone");
 
                 const instructionText = document.createElement("p");
                 instructionText.style.fontSize = "12px";
-                instructionText.style.color = "var(--subtitle-color)";
-                instructionText.style.marginBottom = "10px";
-                instructionText.style.marginTop = "0";
-                instructionText.innerHTML = "💡 Draw on the image below to mark areas for editing (white = edit, black = preserve)";
-                inpaintBox.appendChild(instructionText);
+                instruc
 
-                // Create canvas drawing area
-                const canvasContainer = document.createElement("div");
-                canvasContainer.style.position = "relative";
-                canvasContainer.style.marginBottom = "10px";
-                canvasContainer.style.border = "2px solid var(--border-color)";
-                canvasContainer.style.borderRadius = "8px";
-                canvasContainer.s
-
-[TRUNCATED - Excerpt was 138918 characters, showing first 30,000 characters]
+[TRUNCATED - Excerpt was 139684 characters, showing first 30,000 characters]
 ```
 
 ### .env

@@ -1,0 +1,101 @@
+{
+  "id": "graph-1234567890",
+  "name": "Lighting Processing Pipeline",
+  "nodes": [
+    {
+      "id": "node-1",
+      "type": "ai/render",
+      "label": "Nano Variant Render",
+      "position": {
+        "x": 100,
+        "y": 100
+      },
+      "inputs": [
+        {
+          "id": "image_path",
+          "name": "Image Path",
+          "dataType": "string",
+          "direction": "input"
+        },
+        {
+          "id": "lighting_mode",
+          "name": "Lighting Mode",
+          "dataType": "string",
+          "direction": "input"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "output_path",
+          "name": "Output Path",
+          "dataType": "string",
+          "direction": "output"
+        }
+      ],
+      "params": {
+        "lighting_mode": "night",
+        "style_name": "modern",
+        "resolution": "4K",
+        "strength": "medium",
+        "color_temp": "neutral"
+      },
+      "meta": {
+        "agentId": "nano_variant",
+        "agentName": "Nano Variant Render",
+        "agentType": "render",
+        "category": "rendering",
+        "description": "Main rendering agent for architectural lighting"
+      }
+    },
+    {
+      "id": "node-2",
+      "type": "ai/refine",
+      "label": "Refine Render",
+      "position": {
+        "x": 400,
+        "y": 100
+      },
+      "inputs": [
+        {
+          "id": "original_job_id",
+          "name": "Original Job ID",
+          "dataType": "string",
+          "direction": "input"
+        },
+        {
+          "id": "user_feedback",
+          "name": "User Feedback",
+          "dataType": "string",
+          "direction": "input"
+        }
+      ],
+      "outputs": [
+        {
+          "id": "output_path",
+          "name": "Refined Output Path",
+          "dataType": "string",
+          "direction": "output"
+        }
+      ],
+      "params": {
+        "user_feedback": "Make it brighter"
+      },
+      "meta": {
+        "agentId": "refine",
+        "agentName": "Refine Render",
+        "agentType": "refine"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-1",
+      "sourceNodeId": "node-1",
+      "sourcePortId": "output_path",
+      "targetNodeId": "node-2",
+      "targetPortId": "original_job_id"
+    }
+  ]
+}
+
+

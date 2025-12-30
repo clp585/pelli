@@ -564,6 +564,10 @@ def process_video_job(job_id, image_path, options):
             job_id=job_id,
         )
         
+        # Determine artifact type and MIME type
+        artifact_type = 'video' if video_path.endswith('.mp4') else 'file'
+        artifact_mime = 'video/mp4' if artifact_type == 'video' else 'text/plain'
+        
         # Send completion message
         q.put({
             "type": "complete",
@@ -571,7 +575,9 @@ def process_video_job(job_id, image_path, options):
                 "status": "success",
                 "video": video_path,
                 "cost_usd": cost_usd,
-                "settings": options
+                "settings": options,
+                "artifact_type": artifact_type,
+                "artifact_mime": artifact_mime
             }
         })
     except Exception as e:

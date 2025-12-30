@@ -1,0 +1,21 @@
+{
+"fog": {
+  "description": "Very light atmospheric mist with high visibility",
+  "material_emphasis": "foreground and midground remain clear and detailed, background only slightly softened",
+  "atmosphere": "subtle haze, mostly clear air, normal contrast, only a gentle sense of distance",
+  "additional_instruction": "Use only a thin, delicate mist that keeps the scene mostly clear. Preserve sharp edges, material detail, and color saturation. Avoid thick or cinematic fog, avoid strong haze, bloom, glow, or god rays. Do NOT obscure buildings or landscape; visibility should extend far into the distance."
+},
+
+  "crystal_clear": {
+    "description": "Ultra-clear, sharp atmosphere",
+    "material_emphasis": "crisp glass, sharp reflections, high clarity",
+    "atmosphere": "bright, high-contrast, low haze",
+    "additional_instruction": "Eliminate haze; emphasize clarity, reflections, and fine detail."
+  },
+  "bloom": {
+    "description": "Glowing highlights with bloom",
+    "material_emphasis": "bright emissive elements, reflective surfaces",
+    "atmosphere": "dreamy, Bloom, high dynamic range",
+    "additional_instruction": "Add bloom around lights and highlights while keeping overall exposure balanced."
+  }
+}

@@ -1,0 +1,142 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Graph Definition Schema",
+  "description": "Framework-agnostic graph definition format for AI Node Editor",
+  "type": "object",
+  "required": ["id", "name", "nodes", "edges"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the graph"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name for the graph"
+    },
+    "nodes": {
+      "type": "array",
+      "description": "Array of node definitions",
+      "items": {
+        "$ref": "#/definitions/NodeDefinition"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "description": "Array of edge definitions",
+      "items": {
+        "$ref": "#/definitions/EdgeDefinition"
+      }
+    }
+  },
+  "definitions": {
+    "NodeDefinition": {
+      "type": "object",
+      "required": ["id", "type", "label", "position", "params"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the node"
+        },
+        "type": {
+          "type": "string",
+          "description": "Node type identifier, e.g. 'ai/lighting-agent', 'input/prompt'",
+          "pattern": "^[a-z]+/[a-z-]+$"
+        },
+        "label": {
+          "type": "string",
+          "description": "Human-readable label for the node"
+        },
+        "position": {
+          "type": "object",
+          "required": ["x", "y"],
+          "properties": {
+            "x": {
+              "type": "number",
+              "description": "X coordinate on the canvas"
+            },
+            "y": {
+              "type": "number",
+              "description": "Y coordinate on the canvas"
+            }
+          }
+        },
+        "inputs": {
+          "type": "array",
+          "description": "Optional input port definitions",
+          "items": {
+            "$ref": "#/definitions/PortDefinition"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "description": "Optional output port definitions",
+          "items": {
+            "$ref": "#/definitions/PortDefinition"
+          }
+        },
+        "params": {
+          "type": "object",
+          "description": "User-configurable properties for the node",
+          "additionalProperties": true
+        },
+        "meta": {
+          "type": "object",
+          "description": "Extra metadata (e.g. category, icon, description)",
+          "additionalProperties": true
+        }
+      }
+    },
+    "PortDefinition": {
+      "type": "object",
+      "required": ["id", "name", "dataType", "direction"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the port"
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable name for the port"
+        },
+        "dataType": {
+          "type": "string",
+          "description": "Data type, e.g. 'string', 'number', 'json', 'image'",
+          "enum": ["string", "number", "boolean", "json", "image", "any"]
+        },
+        "direction": {
+          "type": "string",
+          "enum": ["input", "output"],
+          "description": "Port direction"
+        }
+      }
+    },
+    "EdgeDefinition": {
+      "type": "object",
+      "required": ["id", "sourceNodeId", "sourcePortId", "targetNodeId", "targetPortId"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the edge"
+        },
+        "sourceNodeId": {
+          "type": "string",
+          "description": "ID of the source node"
+        },
+        "sourcePortId": {
+          "type": "string",
+          "description": "ID of the source port"
+        },
+        "targetNodeId": {
+          "type": "string",
+          "description": "ID of the target node"
+        },
+        "targetPortId": {
+          "type": "string",
+          "description": "ID of the target port"
+        }
+      }
+    }
+  }
+}
+
+

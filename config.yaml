@@ -1,0 +1,12 @@
+projects:
+  project_alpha:
+    path: 'data/project_alpha'
+    metadata_file: 'metadata.csv'
+    pdf_folder: 'pdfs'
+    output_path: 'output'
+
+  dallas_fs:
+    path: 'data/raw/ProjectBeta'
+    metadata_file: 'metadata.csv'
+    pdf_folder: '.'
+    output_path: 'data/processed/DallasFS'

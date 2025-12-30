@@ -1,0 +1,32 @@
+tower_view_01 | morning | output\tower_view_01__morning.txt
+tower_view_01 | noon | output\tower_view_01__noon.txt
+tower_view_01 | sunset | output\tower_view_01__sunset.txt
+tower_view_01 | night | output\tower_view_01__night.txt
+tower_view_01 | morning | output\tower_view_01__morning.txt
+tower_view_01 | noon | output\tower_view_01__noon.txt
+tower_view_01 | sunset | output\tower_view_01__sunset.txt
+tower_view_01 | night | output\tower_view_01__night.txt
+tower_view_01 | morning | output\tower_view_01__morning.txt
+tower_view_01 | noon | output\tower_view_01__noon.txt
+tower_view_01 | sunset | output\tower_view_01__sunset.txt
+tower_view_01 | night | output\tower_view_01__night.txt
+tower_view_01 | morning | output\tower_view_01__morning.png
+tower_view_01 | noon | output\tower_view_01__noon.png
+tower_view_01 | sunset | output\tower_view_01__sunset.png
+tower_view_01 | night | output\tower_view_01__night.png
+tower_view_01 | morning | output\tower_view_01__morning.png
+tower_view_01 | noon | output\tower_view_01__noon.png
+tower_view_01 | sunset | output\tower_view_01__sunset.png
+tower_view_01 | night | output\tower_view_01__night.png
+tower_view_01 | morning | output\tower_view_01__morning.png
+tower_view_01 | noon | output\tower_view_01__noon.png
+tower_view_01 | sunset | output\tower_view_01__sunset.png
+tower_view_01 | night | output\tower_view_01__night.png
+tower_view_01 | morning | output\tower_view_01__morning.png
+tower_view_01 | noon | output\tower_view_01__noon.png
+tower_view_01 | sunset | output\tower_view_01__sunset.png
+tower_view_01 | night | output\tower_view_01__night.png
+tower_view_01 | morning | pelli_modern | output\tower_view_01__morning__pelli_modern.png
+tower_view_01 | noon | pelli_modern | output\tower_view_01__noon__pelli_modern.png
+tower_view_01 | sunset | pelli_modern | output\tower_view_01__sunset__pelli_modern.png
+tower_view_01 | night | pelli_modern | output\tower_view_01__night__pelli_modern.png

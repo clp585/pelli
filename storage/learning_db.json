@@ -1,0 +1,23 @@
+{
+  "configurations": [],
+  "style_patterns": {
+    "crystal_clear": {
+      "preferred_color_temp": {
+        "neutral": 0.7
+      },
+      "preferred_contrast": {
+        "balanced": 0.7
+      },
+      "preferred_strength": {
+        "medium": 0.7
+      },
+      "preferred_god_rays": {
+        "0": 0.7
+      },
+      "preferred_bloom": {
+        "99": 0.7
+      },
+      "usage_count": 1
+    }
+  }
+}

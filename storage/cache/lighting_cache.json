@@ -1,0 +1,79 @@
+{
+  "e515ecc38af94614f29e2120cade8e6a": {
+    "data": {
+      "solar_pos": {
+        "elevation": -15.0,
+        "azimuth": 270.0,
+        "color_temp": 2700.0
+      },
+      "shadow_data": {
+        "shadow_direction": 90.0,
+        "shadow_length": "undefined",
+        "shadow_softness": 1.0,
+        "shadow_areas": [
+          "deep architectural recesses",
+          "ground contact points (ambient occlusion)",
+          "east-facing facades (darkest points away from residual western twilight)",
+          "underside of overhangs",
+          "corners occluded from artificial street lighting"
+        ],
+        "shadow_color_temp": 11000,
+        "shadow_saturation": 0.3
+      },
+      "color_data": {
+        "overall_color_temp": 3200,
+        "sky_color_temp": 9500,
+        "facade_color_temp": 3500,
+        "interior_color_temp": 2700,
+        "color_saturation": 0.85,
+        "warm_cool_balance": 0.35
+      },
+      "atmosphere_data": {
+        "fog_density": 0.05,
+        "haze_density": 0.15,
+        "volumetric_scattering": 0.1,
+        "atmospheric_perspective": 0.3,
+        "god_rays_intensity": 0.0
+      }
+    },
+    "timestamp": "2025-12-19T16:42:48.630480"
+  },
+  "3f46b0795fabd6b78e60eee2956a3fdd": {
+    "data": {
+      "solar_pos": {
+        "elevation": -15.0,
+        "azimuth": 270.0,
+        "color_temp": 2700.0
+      },
+      "shadow_data": {
+        "shadow_direction": 90,
+        "shadow_length": "undefined (sun below horizon)",
+        "shadow_softness": 1.0,
+        "shadow_areas": [
+          "building_recesses",
+          "ground_contact_occlusion",
+          "corners_away_from_artificial_light",
+          "deep_alleys"
+        ],
+        "shadow_color_temp": 9500,
+        "shadow_saturation": 0.2
+      },
+      "color_data": {
+        "overall_color_temp": 3200,
+        "sky_color_temp": 9000,
+        "facade_color_temp": 5500,
+        "interior_color_temp": 2700,
+        "color_saturation": 0.85,
+        "warm_cool_balance": 0.3
+      },
+      "atmosphere_data": {
+        "fog_density": 0.08,
+        "haze_density": 0.2,
+        "volumetric_scattering": 0.1,
+        "atmospheric_perspective": 0.5,
+        "god_rays_intensity": 0.0
+      }
+    },
+    "timestamp": "2025-12-19T16:16:18.209689"
+  }
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "job_id": "03440218-194f-4cf2-9d9a-43c1c68f21b8_night_251218UpdatedMassingScene_271_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766420548.7542663,
+    "date": "2025-12-22T11:22:28.754266"
+  },
+  {
+    "job_id": "b23cfc4f-97d3-4eb5-9c10-f7ed0f643c73_morning_251218UpdatedMassingScene_277_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "morning",
+    "num_images": 1,
+    "timestamp": 1766422339.9882758,
+    "date": "2025-12-22T11:52:19.988275"
+  },
+  {
+    "job_id": "b23cfc4f-97d3-4eb5-9c10-f7ed0f643c73_noon_251218UpdatedMassingScene_277_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "noon",
+    "num_images": 1,
+    "timestamp": 1766422339.999744,
+    "date": "2025-12-22T11:52:19.999744"
+  },
+  {
+    "job_id": "b23cfc4f-97d3-4eb5-9c10-f7ed0f643c73_night_251218UpdatedMassingScene_277_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766422340.0120442,
+    "date": "2025-12-22T11:52:20.012044"
+  },
+  {
+    "job_id": "b23cfc4f-97d3-4eb5-9c10-f7ed0f643c73_sunset_251218UpdatedMassingScene_277_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766422340.0246103,
+    "date": "2025-12-22T11:52:20.024610"
+  }
+]

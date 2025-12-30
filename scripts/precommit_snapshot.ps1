@@ -5,7 +5,7 @@ try {
     Set-Location $repo
 
     Write-Host "[pre-commit] Running snapshot generator..."
-    python export_agent_snapshot_BROKEN.py --out PROJECT_SNAPSHOT.md
+    python export_agent_snapshot.py --out PROJECT_SNAPSHOT.md
     
     if ($LASTEXITCODE -ne 0) {
         Write-Host "[pre-commit] Snapshot generation failed."

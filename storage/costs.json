@@ -1,0 +1,982 @@
+[
+  {
+    "job_id": "4ba7343c-b749-4e8f-aaf8-560c8ee73552_sunset",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766161983.1146123,
+    "date": "2025-12-19T11:33:03.114612"
+  },
+  {
+    "job_id": "f446f5d0-5d9c-4a2d-86f1-a2c89b4424ff_sunset",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766162168.2951255,
+    "date": "2025-12-19T11:36:08.295125"
+  },
+  {
+    "job_id": "93921a6b-82d6-4ec5-a97b-21faeb15d5c6_night",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766162660.2396789,
+    "date": "2025-12-19T11:44:20.239679"
+  },
+  {
+    "job_id": "05399962-3d84-4e7b-ac8a-f705efa2d119_morning",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "morning",
+    "num_images": 1,
+    "timestamp": 1766163122.2838485,
+    "date": "2025-12-19T11:52:02.283848"
+  },
+  {
+    "job_id": "05399962-3d84-4e7b-ac8a-f705efa2d119_noon",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "noon",
+    "num_images": 1,
+    "timestamp": 1766163122.2892275,
+    "date": "2025-12-19T11:52:02.289227"
+  },
+  {
+    "job_id": "05399962-3d84-4e7b-ac8a-f705efa2d119_sunset",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766163122.3149283,
+    "date": "2025-12-19T11:52:02.314928"
+  },
+  {
+    "job_id": "05399962-3d84-4e7b-ac8a-f705efa2d119_night",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766163122.3331716,
+    "date": "2025-12-19T11:52:02.333171"
+  },
+  {
+    "job_id": "777a4486-a12f-4d26-9b13-1d36a5674b63_night",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766164586.0356183,
+    "date": "2025-12-19T12:16:26.035618"
+  },
+  {
+    "job_id": "70beec4c-8412-457f-b296-78ef6364ecd6_night",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "fog",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766164937.501482,
+    "date": "2025-12-19T12:22:17.501481"
+  },
+  {
+    "job_id": "abe48394-c79d-407d-8e29-e84a5a40d452_night",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766165098.3737898,
+    "date": "2025-12-19T12:24:58.373789"
+  },
+  {
+    "job_id": "16ef3fb4-ed83-44a6-8ce7-afa5df2b3e5b_sunset_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766166722.506943,
+    "date": "2025-12-19T12:52:02.506943"
+  },
+  {
+    "job_id": "48b66e79-1ded-4f45-a51d-d6e6a9091db6_morning_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "morning",
+    "num_images": 1,
+    "timestamp": 1766167868.188157,
+    "date": "2025-12-19T13:11:08.188157"
+  },
+  {
+    "job_id": "87f512b3-a833-4160-bade-685c907d9afc_sunset_251218UpdatedMassingScene_270_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766169793.1776304,
+    "date": "2025-12-19T13:43:13.177630"
+  },
+  {
+    "job_id": "82fdd597-1ffd-4117-8f44-6550900f437a_night_251218UpdatedMassingScene_270_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766169929.6681893,
+    "date": "2025-12-19T13:45:29.668189"
+  },
+  {
+    "job_id": "d52af5e8-bf91-49e1-af83-dd51e45f95f0_night_251218UpdatedMassingScene_270_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766170061.104475,
+    "date": "2025-12-19T13:47:41.104475"
+  },
+  {
+    "job_id": "a88aed30-8a80-4d72-b798-b0c0e9c71c3c_night_251218UpdatedMassingScene_270_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766170526.671516,
+    "date": "2025-12-19T13:55:26.671516"
+  },
+  {
+    "job_id": "6d07da7a-2546-447c-95e3-c1f382b37587_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766173685.694532,
+    "date": "2025-12-19T14:48:05.694531"
+  },
+  {
+    "job_id": "baad1aa4-816d-47b0-be5c-f2211b05c9f1_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766173792.3344164,
+    "date": "2025-12-19T14:49:52.334416"
+  },
+  {
+    "job_id": "381a56a0-f55d-4fdc-9c03-66fb3d16e34d_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766173912.9988506,
+    "date": "2025-12-19T14:51:52.998850"
+  },
+  {
+    "job_id": "2fd16963-2438-4439-af69-192935c27120_night_251218UpdatedMassingScene_270_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766174192.128956,
+    "date": "2025-12-19T14:56:32.128956"
+  },
+  {
+    "job_id": "d76b20f2-65f3-4150-b87b-f96072ec8688_night_251218UpdatedMassingScene_270_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766174330.7875865,
+    "date": "2025-12-19T14:58:50.787586"
+  },
+  {
+    "job_id": "02377c4f-a0c3-4013-a124-3b8974551f56_night_251218UpdatedMassingScene_270_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766178672.6641297,
+    "date": "2025-12-19T16:11:12.664129"
+  },
+  {
+    "job_id": "1bcce011-3459-44c1-94a8-5f6a3730eaed_night_251218UpdatedMassingScene_273_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766179065.8091366,
+    "date": "2025-12-19T16:17:45.809136"
+  },
+  {
+    "job_id": "c1676b2a-3843-43de-ad02-6a93410fb854_night_251218UpdatedMassingScene_270_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766180107.4633236,
+    "date": "2025-12-19T16:35:07.463323"
+  },
+  {
+    "job_id": "57520214-1ca9-4234-b824-3161473235b0_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766180560.5629609,
+    "date": "2025-12-19T16:42:40.562960"
+  },
+  {
+    "job_id": "e8a7f63d-3eb9-45d8-9d76-869466e37606_night_251218UpdatedMassingScene_271_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766180656.2720845,
+    "date": "2025-12-19T16:44:16.272084"
+  },
+  {
+    "job_id": "ccc248aa-69d4-42aa-9e5c-85ca79d466d3_night_251218UpdatedMassingScene_277_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766181211.4978955,
+    "date": "2025-12-19T16:53:31.497895"
+  },
+  {
+    "job_id": "52ba77f0-896c-42bb-8bf2-e377bd7db132_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766181894.4116914,
+    "date": "2025-12-19T17:04:54.411691"
+  },
+  {
+    "job_id": "bb1373a8-0d9f-4f1e-ba2d-97fc02c41eca_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766182072.9290779,
+    "date": "2025-12-19T17:07:52.929077"
+  },
+  {
+    "job_id": "1bf422f8-8392-45d5-94a5-9afd79aac058_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766182865.1857564,
+    "date": "2025-12-19T17:21:05.185756"
+  },
+  {
+    "job_id": "8b859975-1348-411f-bb91-51b2c9086111_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766183006.5002313,
+    "date": "2025-12-19T17:23:26.500231"
+  },
+  {
+    "job_id": "4cd1ec77-38a6-48e6-8110-5ba960f83447_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766183130.200484,
+    "date": "2025-12-19T17:25:30.200484"
+  },
+  {
+    "job_id": "0eac30ee-a7b9-45ae-a2e5-931bc63e7f9c_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766183282.4773989,
+    "date": "2025-12-19T17:28:02.477398"
+  },
+  {
+    "job_id": "ff291c0d-25e5-4300-9d22-5fdc23d64e1b_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766184221.84063,
+    "date": "2025-12-19T17:43:41.840630"
+  },
+  {
+    "job_id": "d04efbb5-6a98-48dd-bd7e-b8407cde94cb_night_251218UpdatedMassingScene_275_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766184952.1742063,
+    "date": "2025-12-19T17:55:52.174206"
+  },
+  {
+    "job_id": "e6e8fc53-320e-4d75-ab54-010d64f8ad16_night_251218UpdatedMassingScene_275_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766185097.111816,
+    "date": "2025-12-19T17:58:17.111816"
+  },
+  {
+    "job_id": "be3c2a5f-8fa0-4009-8f3d-eb12b773e65e_night_251218UpdatedMassingScene_271_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766185475.8806896,
+    "date": "2025-12-19T18:04:35.880689"
+  },
+  {
+    "job_id": "0b433948-55f7-442e-a680-2785aeb56adc_night_251218UpdatedMassingScene_271_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766185618.1136477,
+    "date": "2025-12-19T18:06:58.113647"
+  },
+  {
+    "job_id": "d944e9d4-2a1b-4093-8aa1-7b9b534ac4c6_night_251218UpdatedMassingScene_271_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766185783.052747,
+    "date": "2025-12-19T18:09:43.052747"
+  },
+  {
+    "job_id": "4d5a6ce4-94e0-4533-9c8e-daefd45f7602_night_251218UpdatedMassingScene_271_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766185965.570034,
+    "date": "2025-12-19T18:12:45.570033"
+  },
+  {
+    "job_id": "9ead231a-df6a-4fe0-a219-42aca5462a8d_night_001_9.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766265127.303488,
+    "date": "2025-12-20T16:12:07.303488"
+  },
+  {
+    "job_id": "a0570400-1d2d-43db-9cd2-bb876be663c3_night_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "bloom",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766266002.899829,
+    "date": "2025-12-20T16:26:42.899828"
+  },
+  {
+    "job_id": "a0570400-1d2d-43db-9cd2-bb876be663c3_morning_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "bloom",
+    "lighting_mode": "morning",
+    "num_images": 1,
+    "timestamp": 1766266002.924726,
+    "date": "2025-12-20T16:26:42.924725"
+  },
+  {
+    "job_id": "a0570400-1d2d-43db-9cd2-bb876be663c3_sunset_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "bloom",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766266002.9470944,
+    "date": "2025-12-20T16:26:42.947094"
+  },
+  {
+    "job_id": "a0570400-1d2d-43db-9cd2-bb876be663c3_noon_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "bloom",
+    "lighting_mode": "noon",
+    "num_images": 1,
+    "timestamp": 1766266002.9726088,
+    "date": "2025-12-20T16:26:42.972608"
+  },
+  {
+    "job_id": "42d6ede5-42df-4120-9ebe-9af4eb6d2a1b_night_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766266253.8376842,
+    "date": "2025-12-20T16:30:53.837684"
+  },
+  {
+    "job_id": "42d6ede5-42df-4120-9ebe-9af4eb6d2a1b_noon_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "noon",
+    "num_images": 1,
+    "timestamp": 1766266253.8588438,
+    "date": "2025-12-20T16:30:53.858843"
+  },
+  {
+    "job_id": "42d6ede5-42df-4120-9ebe-9af4eb6d2a1b_morning_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "morning",
+    "num_images": 1,
+    "timestamp": 1766266253.8799348,
+    "date": "2025-12-20T16:30:53.879934"
+  },
+  {
+    "job_id": "42d6ede5-42df-4120-9ebe-9af4eb6d2a1b_sunset_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766266253.8982728,
+    "date": "2025-12-20T16:30:53.898272"
+  },
+  {
+    "job_id": "8a06c785-ea21-4dab-96cb-7d94f0bcc9bf_morning_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "morning",
+    "num_images": 1,
+    "timestamp": 1766266437.4607222,
+    "date": "2025-12-20T16:33:57.460722"
+  },
+  {
+    "job_id": "8a06c785-ea21-4dab-96cb-7d94f0bcc9bf_night_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766266437.4927678,
+    "date": "2025-12-20T16:33:57.492767"
+  },
+  {
+    "job_id": "8a06c785-ea21-4dab-96cb-7d94f0bcc9bf_sunset_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766266437.5226376,
+    "date": "2025-12-20T16:33:57.522637"
+  },
+  {
+    "job_id": "8a06c785-ea21-4dab-96cb-7d94f0bcc9bf_noon_Scene_241.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "noon",
+    "num_images": 1,
+    "timestamp": 1766266437.5519447,
+    "date": "2025-12-20T16:33:57.551944"
+  },
+  {
+    "job_id": "1315cd55-1fae-4eb0-8be3-4af60f4644e1_night_251218UpdatedMassingScene_271_1__night__crystal_clear__4K__b6e3173f.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766266958.969313,
+    "date": "2025-12-20T16:42:38.969313"
+  },
+  {
+    "job_id": "d6fa1fb3-ece9-438b-a625-6041035d404b_sunset_mashup__mashup_base_251218UpdatedMassingScene_270_1__mashup_style_mashup_style_01_2__86b3b1_1.png",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766267164.6647015,
+    "date": "2025-12-20T16:46:04.664701"
+  },
+  {
+    "job_id": "202f6454-dd55-40e4-b13e-53ce97af033b_night_251218UpdatedMassingScene_271_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "bloom",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766267453.0663564,
+    "date": "2025-12-20T16:50:53.066356"
+  },
+  {
+    "job_id": "99013826-3086-4680-ae59-027bb1b2e6be_sunset_251218UpdatedMassingScene_275_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "bloom",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766372498.686088,
+    "date": "2025-12-21T22:01:38.686088"
+  },
+  {
+    "job_id": "99013826-3086-4680-ae59-027bb1b2e6be_morning_251218UpdatedMassingScene_275_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "bloom",
+    "lighting_mode": "morning",
+    "num_images": 1,
+    "timestamp": 1766372498.706401,
+    "date": "2025-12-21T22:01:38.706400"
+  },
+  {
+    "job_id": "99013826-3086-4680-ae59-027bb1b2e6be_night_251218UpdatedMassingScene_275_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "bloom",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766372498.7264762,
+    "date": "2025-12-21T22:01:38.726476"
+  },
+  {
+    "job_id": "99013826-3086-4680-ae59-027bb1b2e6be_noon_251218UpdatedMassingScene_275_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "bloom",
+    "lighting_mode": "noon",
+    "num_images": 1,
+    "timestamp": 1766372498.750827,
+    "date": "2025-12-21T22:01:38.750826"
+  },
+  {
+    "job_id": "f483f29f-50e5-429d-ab14-5763b3f5de93_noon_251218UpdatedMassingScene_275_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "bloom",
+    "lighting_mode": "noon",
+    "num_images": 1,
+    "timestamp": 1766372764.4959996,
+    "date": "2025-12-21T22:06:04.495999"
+  },
+  {
+    "job_id": "f483f29f-50e5-429d-ab14-5763b3f5de93_night_251218UpdatedMassingScene_275_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "bloom",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766372764.525433,
+    "date": "2025-12-21T22:06:04.525433"
+  },
+  {
+    "job_id": "f483f29f-50e5-429d-ab14-5763b3f5de93_morning_251218UpdatedMassingScene_275_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "bloom",
+    "lighting_mode": "morning",
+    "num_images": 1,
+    "timestamp": 1766372764.54496,
+    "date": "2025-12-21T22:06:04.544960"
+  },
+  {
+    "job_id": "f483f29f-50e5-429d-ab14-5763b3f5de93_sunset_251218UpdatedMassingScene_275_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "bloom",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766372764.5630665,
+    "date": "2025-12-21T22:06:04.563066"
+  },
+  {
+    "job_id": "06e90163-796a-4dc1-be05-4db7fad33527_sunset_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "fog",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766373257.4998858,
+    "date": "2025-12-21T22:14:17.499885"
+  },
+  {
+    "job_id": "06e90163-796a-4dc1-be05-4db7fad33527_morning_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "fog",
+    "lighting_mode": "morning",
+    "num_images": 1,
+    "timestamp": 1766373257.5212822,
+    "date": "2025-12-21T22:14:17.521282"
+  },
+  {
+    "job_id": "06e90163-796a-4dc1-be05-4db7fad33527_noon_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "fog",
+    "lighting_mode": "noon",
+    "num_images": 1,
+    "timestamp": 1766373257.542941,
+    "date": "2025-12-21T22:14:17.542941"
+  },
+  {
+    "job_id": "06e90163-796a-4dc1-be05-4db7fad33527_night_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "fog",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766373257.5639114,
+    "date": "2025-12-21T22:14:17.563911"
+  },
+  {
+    "job_id": "e28a2ee4-2d0b-4d3a-b107-a7bd8a275bd8_night_251218UpdatedMassingScene_277_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766413032.32506,
+    "date": "2025-12-22T09:17:12.325059"
+  },
+  {
+    "job_id": "620ecfbc-73ab-4ded-92ac-a55918b8b67e_sunset_251218UpdatedMassingScene_277_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "fog",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766413186.8599954,
+    "date": "2025-12-22T09:19:46.859995"
+  },
+  {
+    "job_id": "939ad4a1-8312-4a27-8166-68dead9fecf6",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766417038.244831,
+    "date": "2025-12-22T10:23:58.244830"
+  },
+  {
+    "job_id": "ba93912d-e39a-467b-80a1-1774e97e06c8",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766417442.527914,
+    "date": "2025-12-22T10:30:42.527913"
+  },
+  {
+    "job_id": "6f276342-6119-4520-86bc-ec8c59d7bf0f",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766417577.9112897,
+    "date": "2025-12-22T10:32:57.911289"
+  },
+  {
+    "job_id": "1ee174a5-000f-4054-8307-923ad934dc17",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766417719.027987,
+    "date": "2025-12-22T10:35:19.027987"
+  },
+  {
+    "job_id": "36fe928e-b71f-4c6f-bbd2-cfba4063f438_night_251218UpdatedMassingScene_270_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766418861.9639225,
+    "date": "2025-12-22T10:54:21.963922"
+  },
+  {
+    "job_id": "c2a7ac13-9b9c-44bc-8073-f565c40c64ce_night_251218UpdatedMassingScene_270_1.jpg",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766418936.564565,
+    "date": "2025-12-22T10:55:36.564565"
+  },
+  {
+    "job_id": "34526c4c-551f-45cb-bde7-da293af2aa14",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766419048.7889264,
+    "date": "2025-12-22T10:57:28.788926"
+  },
+  {
+    "job_id": "bfe09b57-42f3-4112-a688-a00a0cf67389",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766419883.431517,
+    "date": "2025-12-22T11:11:23.431516"
+  },
+  {
+    "job_id": "4325d0d2-e990-455f-a30e-bcbaa0e48720_sunset_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766423165.736578,
+    "date": "2025-12-22T12:06:05.736578"
+  },
+  {
+    "job_id": "cd73499d-3821-4f43-aeda-f2556c099d8c_sunset_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766423456.74161,
+    "date": "2025-12-22T12:10:56.741609"
+  },
+  {
+    "job_id": "cd73499d-3821-4f43-aeda-f2556c099d8c_noon_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "noon",
+    "num_images": 1,
+    "timestamp": 1766423456.7620971,
+    "date": "2025-12-22T12:10:56.762097"
+  },
+  {
+    "job_id": "cd73499d-3821-4f43-aeda-f2556c099d8c_morning_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "morning",
+    "num_images": 1,
+    "timestamp": 1766423456.7841747,
+    "date": "2025-12-22T12:10:56.784174"
+  },
+  {
+    "job_id": "cd73499d-3821-4f43-aeda-f2556c099d8c_night_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766423456.8087068,
+    "date": "2025-12-22T12:10:56.808706"
+  },
+  {
+    "job_id": "8ed13c6f-e37d-4ac7-910c-3e90c87fd7c0",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766424170.8820548,
+    "date": "2025-12-22T12:22:50.882054"
+  },
+  {
+    "job_id": "f0f078d2-fc50-429d-8fc6-08d31bd79308_sunset_251218UpdatedMassingScene_269_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "sunset",
+    "num_images": 1,
+    "timestamp": 1766424369.765318,
+    "date": "2025-12-22T12:26:09.765317"
+  },
+  {
+    "job_id": "dbba64ce-d87c-4708-bd29-89c81f5e1a75",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766424612.0162919,
+    "date": "2025-12-22T12:30:12.016291"
+  },
+  {
+    "job_id": "316354d7-3352-4439-bb83-19c459d76771",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766429358.596718,
+    "date": "2025-12-22T13:49:18.596718"
+  },
+  {
+    "job_id": "ca502bca-cdf5-4c36-ac50-02925693d462_night_251218UpdatedMassingScene_270_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766429682.1272752,
+    "date": "2025-12-22T13:54:42.127275"
+  },
+  {
+    "job_id": "296943cb-7edf-4aa8-be6a-0e3ae2ce5f2b_night_251218UpdatedMassingScene_271_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766430006.1413476,
+    "date": "2025-12-22T14:00:06.141347"
+  },
+  {
+    "job_id": "90edf5da-5baa-4d4a-ad7d-a97d58863914",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766430085.9869153,
+    "date": "2025-12-22T14:01:25.986915"
+  },
+  {
+    "job_id": "fa8d159f-9723-4fcd-9461-d0544be2f7c0",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766430169.5200753,
+    "date": "2025-12-22T14:02:49.520075"
+  },
+  {
+    "job_id": "72f26286-e7a8-49c6-b717-373b72993474",
+    "cost_usd": 0.1,
+    "resolution": "4K",
+    "style_name": "inpaint",
+    "lighting_mode": "inpaint",
+    "num_images": 1,
+    "timestamp": 1766430286.2711046,
+    "date": "2025-12-22T14:04:46.271104"
+  },
+  {
+    "job_id": "d1af7114-ef9b-4335-b4ad-10fe569fead4_night_251218UpdatedMassingScene_271_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766431664.5138125,
+    "date": "2025-12-22T14:27:44.513812"
+  },
+  {
+    "job_id": "2a5f6c54-749a-42dd-a153-4eaeb595f6cf_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766431818.879347,
+    "date": "2025-12-22T14:30:18.879347"
+  },
+  {
+    "job_id": "9b400650-8c45-4e35-b58a-191636455ecb_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766431957.9027185,
+    "date": "2025-12-22T14:32:37.902718"
+  },
+  {
+    "job_id": "5782427b-d833-494f-929c-d68639175dd8_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766432081.2417836,
+    "date": "2025-12-22T14:34:41.241783"
+  },
+  {
+    "job_id": "835d0f0a-eb4c-4fbe-9839-41bb10fda939_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "bloom",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766432362.5348058,
+    "date": "2025-12-22T14:39:22.534805"
+  },
+  {
+    "job_id": "e3b2e2af-a761-49f1-ab03-5a918c24e71d_night_251218UpdatedMassingScene_272_1.jpg",
+    "cost_usd": 0.05,
+    "resolution": "1K",
+    "style_name": "crystal_clear",
+    "lighting_mode": "night",
+    "num_images": 1,
+    "timestamp": 1766432897.3959086,
+    "date": "2025-12-22T14:48:17.395908"
+  }
+]

@@ -1,0 +1,31 @@
+Here is the assessment report for the **tower_view_01** lighting set.
+
+### **Base View: tower_view_01**
+
+#### **1. Morning (`output\tower_view_01__morning.txt`)**
+*   **Description:** The image captures a soft, cool atmosphere with low-angle eastern light hitting the primary facade. There is a subtle volumetric fog added to the street level which helps separate the foreground from the tower. Shadows are long and soft.
+*   **Issues:** The atmospheric haze is slightly heavy at the top of the tower, reducing the contrast on the crown geometry slightly. The vegetation scale in the foreground appears correct, though the dew/wetness effect on the pavement is perhaps a bit exaggerated.
+*   **Status:** Usable for mood boards.
+
+#### **2. Noon (`output\tower_view_01__noon.txt`)**
+*   **Description:** High-contrast lighting with sharp, defined shadows. The materials (glass and concrete/steel) are most legible in this view. The sky is a vibrant clear blue.
+*   **Issues:** The reflection on the south-facing glazing is very intense, almost "blowing out" the detail of the mullions in that specific area. Pedestrians look plausible, though one figure near the entrance has slightly floating feet shadow artifacts.
+*   **Status:** Excellent for technical material review.
+
+#### **3. Sunset (`output\tower_view_01__sunset.txt`)**
+*   **Description:** Dramatic "golden hour" lighting. The sky features a gradient of deep orange to violet. Interior lights are just starting to glow, creating a pleasing warm/cool contrast with the exterior ambient light. The building geometry reads clearly against the colorful sky.
+*   **Issues:** Minimal issues. The color balance is rich without being oversaturated. The transition between the reflected sunset on the glass and the transparency of the interior is handled well.
+*   **Status:** **Strongest Candidate.**
+
+#### **4. Night (`output\tower_view_01__night.txt`)**
+*   **Description:** The building is primarily defined by interior illumination and exterior architectural accent lighting. The background city context is dark, allowing the tower to pop.
+*   **Issues:** The foreground street lighting is a bit dim, making the base of the building feel slightly disconnected from the ground plane. Some noise is visible in the darkest shadow areas of the neighboring context buildings.
+*   **Status:** Good, but requires post-production brightening at the street level.
+
+---
+
+### **Hero Image Recommendation**
+
+**Recommendation:** **Sunset (`output\tower_view_01__sunset.txt`)**
+
+**Reasoning:** This image offers the best balance of architectural definition and emotional resonance. The "Golden Hour" lighting highlights the facade articulation beautifully while the mix of natural and artificial light creates a sophisticated, high-end commercial look suitable for a brochure cover or main website banner. The Noon shot is technically accurate but lacks the narrative drama required for a Hero shot.

@@ -28,10 +28,12 @@ def generate_veo_video(
     os.makedirs(output_folder, exist_ok=True)
     safe_job = job_id or uuid.uuid4().hex[:8]
     filename = f"veo_stub_{safe_job}.txt"
-    out_path = os.path.join(output_folder, filename).replace('\\\\','/')
-
+    
+    # Create file system path for writing
+    fs_path = os.path.join(output_folder, filename).replace('\\\\','/')
+    
     # Create a small placeholder artifact (text file) so /output serving works.
-    with open(out_path, "w", encoding="utf-8") as f:
+    with open(fs_path, "w", encoding="utf-8") as f:
         f.write("VEO3 STUB\n")
         f.write(f"image_path={image_path}\n")
         f.write(f"shot_preset={shot_preset}\n")
@@ -39,6 +41,9 @@ def generate_veo_video(
         f.write(f"fps={fps}\n")
         f.write(f"aspect={aspect}\n")
 
+    # Return path in /output/<filename> format to match image contract style
+    out_path = f"/output/{filename}"
+    
     # Return a tiny MVP cost (adjust later)
     cost_usd = 0.10
     return out_path, cost_usd

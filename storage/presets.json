@@ -1,0 +1,36 @@
+{
+  "preset_1766180448": {
+    "id": "preset_1766180448",
+    "name": "Night 1",
+    "description": "",
+    "settings": {
+      "style": "crystal_clear",
+      "lighting": "night",
+      "resolution": "1K",
+      "strength": "subtle",
+      "color_temp": "neutral",
+      "contrast": "soft",
+      "weather": "clear",
+      "season": "none"
+    },
+    "created": 1766180448.6560657,
+    "created_date": "2025-12-19T16:40:48.656065"
+  },
+  "preset_1766372403": {
+    "id": "preset_1766372403",
+    "name": "Night II",
+    "description": "",
+    "settings": {
+      "style": "bloom",
+      "lighting": "night",
+      "resolution": "1K",
+      "strength": "strong",
+      "color_temp": "neutral",
+      "contrast": "soft",
+      "weather": "clear",
+      "season": "summer"
+    },
+    "created": 1766372403.847503,
+    "created_date": "2025-12-21T22:00:03.847502"
+  }
+}
