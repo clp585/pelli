@@ -2,7 +2,7 @@
 
 ## Build Identity
 
-**Generated:** 2025-12-30 13:01:13
+**Generated:** 2025-12-30 13:01:28
 **Source Path:** C:\Users\cperez.PELLI\Desktop\AI Lighting Agent
 
 ## Repo Tree
@@ -219,7 +219,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from flask import Flask, render_template, request, jsonify, send_from_directory, Response, stream_with_context, send_file
 from werkzeug.utils import secure_filename
 
-# Test comment for pre-commit hook testing
+# Test comment for pre-commit hook testing - updated
 
 # Removed 'analyze_render' from imports
 # ADDED refine_render and inpaint_render to imports
@@ -503,9 +503,9 @@ def process_refine_job(new_job_id, original_job_id, feedback):
                     job_id=new_job_id,
                     cost_usd=cost_usd,
                     resolution=original_entry.get("resolution", "4K"),
-                    style_name=original_en
+                    style_name=o
 
-[TRUNCATED - Original file was 38118 characters, showing first 12000 characters]
+[TRUNCATED - Original file was 38128 characters, showing first 12000 characters]
 ```
 
 *Note: File content truncated to 12,000 characters*
