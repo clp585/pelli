@@ -2,8 +2,8 @@
 
 ## Build Identity
 
-**Generated:** 2025-12-30 13:17:44
-**Source Path:** C:\Users\cperez.PELLI\Desktop\AI Lighting Agent
+**Generated (Timestamp):** 2025-12-30 13:30:05
+**Source Path:** <REPO_ROOT>
 
 ## Repo Tree
 
@@ -117,27 +117,27 @@
 | Path | Methods | Function |
 |------|---------|----------|
 | `/` | GET | `index` |
-| `/api/render` | POST | `render_api` |
-| `/api/refine` | POST | `refine_api` |
-| `/api/inpaint` | POST | `inpaint_api` |
-| `/api/stream/<job_id>` | GET | `stream_status` |
-| `/api/mashup` | POST | `mashup_api` |
-| `/output/<path:filename>` | GET | `serve_output` |
-| `/input/<path:filename>` | GET | `serve_input` |
+| `/api/costs` | GET | `costs_api` |
+| `/api/export/batch` | POST | `export_batch_api` |
+| `/api/export/metadata/<job_id>` | GET | `export_metadata_api` |
 | `/api/gallery` | GET | `gallery_api` |
 | `/api/gallery/<job_id>` | GET | `gallery_entry_api` |
 | `/api/gallery/<job_id>` | DELETE | `delete_gallery_entry_api` |
+| `/api/inpaint` | POST | `inpaint_api` |
+| `/api/mashup` | POST | `mashup_api` |
 | `/api/presets` | GET | `presets_list_api` |
 | `/api/presets` | POST | `presets_save_api` |
 | `/api/presets/<preset_id>` | GET | `preset_get_api` |
 | `/api/presets/<preset_id>` | DELETE | `preset_delete_api` |
 | `/api/presets/<preset_id>/export` | GET | `preset_export_api` |
 | `/api/presets/import` | POST | `preset_import_api` |
-| `/api/costs` | GET | `costs_api` |
-| `/api/export/batch` | POST | `export_batch_api` |
-| `/api/export/metadata/<job_id>` | GET | `export_metadata_api` |
 | `/api/preview` | POST | `preview_api` |
+| `/api/refine` | POST | `refine_api` |
+| `/api/render` | POST | `render_api` |
+| `/api/stream/<job_id>` | GET | `stream_status` |
 | `/health` | GET | `health` |
+| `/input/<path:filename>` | GET | `serve_input` |
+| `/output/<path:filename>` | GET | `serve_output` |
 
 ### /api/render Request Parameters
 
@@ -225,7 +225,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from flask import Flask, render_template, request, jsonify, send_from_directory, Response, stream_with_context, send_file
 from werkzeug.utils import secure_filename
 
-# Test comment for pre-commit hook testing - Step 7 fail-soft test
+# Test change for CI snapshot diff check verification
 
 # Removed 'analyze_render' from imports
 # ADDED refine_render and inpaint_render to imports
@@ -509,9 +509,9 @@ def process_refine_job(new_job_id, original_job_id, feedback):
                     job_id=new_job_id,
                     cost_usd=cost_usd,
                     resolution=original_entry.get("resolution", "4K"),
-                  
+                    style_name=
 
-[TRUNCATED - Original file was 38142 characters, showing first 12000 characters]
+[TRUNCATED - Original file was 38129 characters, showing first 12000 characters]
 ```
 
 *Note: File content truncated to 12,000 characters*

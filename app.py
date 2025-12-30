@@ -11,7 +11,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from flask import Flask, render_template, request, jsonify, send_from_directory, Response, stream_with_context, send_file
 from werkzeug.utils import secure_filename
 
-# Test comment for pre-commit hook testing - Step 7 fail-soft test
+# Test change for CI snapshot diff check verification
 
 # Removed 'analyze_render' from imports
 # ADDED refine_render and inpaint_render to imports
