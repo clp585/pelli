@@ -20,7 +20,7 @@ Standard wiring pattern used in this project:
 
 ## Build Identity
 
-**Generated (Timestamp):** 2025-12-30 16:25:05
+**Generated (Timestamp):** 2025-12-30 17:10:26
 **Source Path:** <REPO_ROOT>
 
 ## Repo Tree
@@ -115,6 +115,7 @@ Standard wiring pattern used in this project:
 ├── package.json
 ├── PERFORMANCE_OPTIMIZATION_PLAN.md
 ├── PROJECT_SNAPSHOT.md
+├── query
 ├── QUICK_START.md
 ├── README_NODE_EDITOR.md
 ├── README_RESTART.md
@@ -123,6 +124,7 @@ Standard wiring pattern used in this project:
 ├── restart.bat
 ├── restart.ps1
 ├── run_agent.py
+├── start
 ├── styles.json
 ├── test_config_loading.py
 └── test_tools.py
