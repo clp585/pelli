@@ -1764,17 +1764,22 @@
                             videoStatus.style.backgroundColor = "#d4edda";
                             videoStatus.style.color = "#155724";
                             let statusText = "Video generation complete!";
-                            if (msg.data && msg.data.cost_usd) {
-                                statusText += ` Cost: $${msg.data.cost_usd.toFixed(2)}`;
+                            // Backend contract: cost_usd (snake_case), with backward-compat fallback
+                            const costUsd = msg.data?.cost_usd ?? msg.data?.costusd;
+                            if (costUsd) {
+                                statusText += ` Cost: $${costUsd.toFixed(2)}`;
                             }
                             videoStatus.textContent = statusText;
                             
                             // Render artifact based on type
                             if (msg.data && msg.data.video) {
-                                // Normalize path to ensure it starts with /
+                                // Backend contract: msg.data.video should already be a normalized /output/... URL
+                                // normalizeOutputPath() is kept only as a backward-compat safety net for edge cases
                                 const videoPath = normalizeOutputPath(msg.data.video);
-                                // Primary path: use artifact_type from backend (backend contract should always emit this)
-                                let artifactType = msg.data.artifact_type;
+                                // Backend contract: artifact_type (snake_case), with backward-compat fallback
+                                let artifactType = msg.data?.artifact_type ?? msg.data?.artifacttype;
+                                // Backend contract: artifact_mime (snake_case), with backward-compat fallback (optional)
+                                const artifactMime = msg.data?.artifact_mime ?? msg.data?.artifactmime;
                                 if (!artifactType) {
                                     // Fallback: infer from file extension if artifact_type missing
                                     // TODO: Remove this fallback once backend contract is enforced (backend should always emit artifact_type)

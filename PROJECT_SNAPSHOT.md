@@ -20,7 +20,7 @@ Standard wiring pattern used in this project:
 
 ## Build Identity
 
-**Generated (Timestamp):** 2025-12-30 15:53:20
+**Generated (Timestamp):** 2025-12-30 16:12:01
 **Source Path:** <REPO_ROOT>
 
 ## Repo Tree
@@ -1120,11 +1120,13 @@ videoBtn.addEventListener("click", async () => {
                             
                             // Render artifact based on type
                             if (msg.data && msg.data.video) {
-                                // Backend contract: msg.data.video is already a normalized /output/... URL
-                                // normalizeOutputPath() is kept only as a backward-compat safety net
+                                // Backend contract: msg.data.video should already be a normalized /output/... URL
+                                // normalizeOutputPath() is kept only as a backward-compat safety net for edge cases
                                 const videoPath = normalizeOutputPath(msg.data.video);
                                 // Backend contract: artifact_type (snake_case), with backward-compat fallback
-                                let artifactType = msg.data.artifact_type ?? msg.data.artifacttype;
+                                let artifactType = msg.data?.artifact_type ?? msg.data?.artifacttype;
+                                // Backend contract: artifact_mime (snake_case), with backward-compat fallback (optional)
+                                const artifactMime = msg.data?.artifact_mime ?? msg.data?.artifactmime;
                                 if (!artifactType) {
                                     // Fallback: infer from file extension if artifact_type missing
                                     // TODO: Remove this fallback once backend contract is enforced (backend should always emit artifact_type)
@@ -1670,15 +1672,9 @@ videoBtn.addEventListener("click", async () => {
             // Clear the mask canvas
             if (maskCanvas) {
                 const ctx = maskCanvas.getContext('2d');
-                ctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
-            }
+                ctx.clearRect(0, 0, maskCanvas.width, ma
 
-            // Update stored base image URL for future in-paint calls
-            containerElement.dataset.currentBaseImage = resultImageUrl;
-
-            // Update the In-Paint button's onclick to use the new base im
-
-[TRUNCATED - Excerpt was 142110 characters, prioritized Video handler section]
+[TRUNCATED - Excerpt was 142360 characters, prioritized Video handler section]
 ```
 
 ### .env

@@ -860,7 +860,8 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
                     # Cap at 30,000 chars as per requirement, but prioritize Video handler section if present
                     original_length = len(content)
                     if original_length > 30000:
-                        # Try to find and prioritize Video handler section (look for videoBtn handler)
+                        # Try to find and prioritize Video handler section (contains cost_usd, artifact_type, artifact_mime)
+                        # The videoBtn.addEventListener handler block contains the Video SSE complete handler with contract tokens
                         video_marker = content.find('videoBtn.addEventListener')
                         if video_marker >= 0:
                             # Video handler found - include it even if we need to truncate elsewhere
@@ -962,17 +963,24 @@ def validate_snapshot_content(snapshot_content: str) -> None:
     """
     Validate that the snapshot content contains required tokens for video endpoint contract.
     
+    Requires snake_case tokens (cost_usd, artifact_type, artifact_mime) - legacy camelCase
+    tokens (costusd, artifacttype, artifactmime) are NOT accepted as valid.
+    
     Raises SystemExit with non-zero code if validation fails.
     """
     missing_tokens = []
     
-    # Check for cost_usd (snake_case) - required for video endpoint
+    # Check for cost_usd (snake_case) - required, legacy costusd is NOT accepted
     if 'cost_usd' not in snapshot_content:
         missing_tokens.append('cost_usd')
     
-    # Check for artifact_type (snake_case) - required for video endpoint
+    # Check for artifact_type (snake_case) - required, legacy artifacttype is NOT accepted
     if 'artifact_type' not in snapshot_content:
         missing_tokens.append('artifact_type')
+    
+    # Check for artifact_mime (snake_case) - required, legacy artifactmime is NOT accepted
+    if 'artifact_mime' not in snapshot_content:
+        missing_tokens.append('artifact_mime')
     
     # Check for /output/ path pattern - required for video artifact URL
     if '/output/' not in snapshot_content:
