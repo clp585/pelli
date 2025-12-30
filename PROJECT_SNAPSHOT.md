@@ -20,7 +20,7 @@ Standard wiring pattern used in this project:
 
 ## Build Identity
 
-**Generated (Timestamp):** 2025-12-30 15:42:21
+**Generated (Timestamp):** 2025-12-30 15:53:20
 **Source Path:** <REPO_ROOT>
 
 ## Repo Tree
@@ -55,6 +55,7 @@ Standard wiring pattern used in this project:
 │   ├── CODE_ORGANIZATION.md
 │   ├── DEV_WORKFLOW.md
 │   ├── FEATURES_IMPLEMENTATION.md
+│   ├── ISSUE_COST_FIELD_STANDARDIZATION.md
 │   ├── LIGHTING_AGENT_IMPROVEMENTS.md
 │   ├── README.md
 │   └── REMAINING_IMPROVEMENTS.md
@@ -1052,353 +1053,7 @@ google-genai>=1.0.0
 ### templates/index.html (JS excerpt)
 
 ```html
-<!-- JavaScript Excerpt (inline script tags and key HTML elements) -->
-
-<!-- ========== Inline JavaScript Code ========== -->
-
-<!-- Inline script block 1 -->
-<script>
-// Fallback loader if primary CDN fails
-        function loadLeafletFallback() {
-            console.warn('Primary Leaflet CDN (jsdelivr) failed, trying fallback (unpkg)...');
-            if (window.leafletLoadAttempted) {
-                console.error('All Leaflet CDNs failed to load');
-                window.leafletLoadFailed = true;
-                return;
-            }
-            window.leafletLoadAttempted = true;
-            
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-            link.crossOrigin = 'anonymous';
-            document.head.appendChild(link);
-            
-            const script = document.createElement('script');
-            script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
-            script.crossOrigin = 'anonymous';
-            script.onerror = function() {
-                console.error('Fallback CDN (unpkg) also failed');
-                window.leafletLoadFailed = true;
-            };
-            script.onload = function() {
-                console.log('Leaflet loaded from fallback CDN (unpkg)');
-                window.leafletLoaded = true;
-                window.leafletLoadFailed = false;
-            };
-            document.head.appendChild(script);
-        }
-        
-        // Check if Leaflet loaded on page load
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                if (typeof L === 'undefined' && !window.leafletLoaded) {
-                    console.warn('Leaflet not loaded after page load, attempting fallback...');
-                    loadLeafletFallback();
-                }
-            }, 1000);
-        });
-</script>
-
-<!-- Inline script block 2 -->
-<script>
-const dropzone = document.getElementById("dropzone");
-        const fileInput = document.getElementById("fileInput");
-        const estimateEl = document.getElementById("estimate");
-        const selectedPreview = document.getElementById("selectedPreview");
-        const renderPreview = document.getElementById("renderPreview");
-        const renderBtn = document.getElementById("renderBtn");
-        const progressContainer = document.getElementById("progressContainer");
-        const progressBar = document.getElementById("progressBar");
-
-        // Status Console
-        const statusConsole = document.getElementById("status-console");
-
-        const mashupBtn = document.getElementById("mashupBtn");
-        const mashupStatus = document.getElementById("mashupStatus");
-        const mashupPreview = document.getElementById("mashupPreview");
-        const mashupResolution = document.getElementById("mashupResolution");
-        const mashupCost = document.getElementById("mashupCost");
-
-        // MAP VARIABLES
-        const mapModal = document.getElementById("mapModal");
-        const openMapBtn = document.getElementById("openMapBtn");
-        const closeModal = document.querySelector(".close-modal");
-        const confirmLocBtn = document.getElementById("confirmLocBtn");
-        const locationInput = document.getElementById("location");
-        let map = null;
-        let currentMarker = null;
-
-        let selectedFiles = [];
-
-        dropzone.addEventListener("click", () => fileInput.click());
-
-        dropzone.addEventListener("dragover", (e) => {
-            e.preventDefault();
-            dropzone.classList.add("dragover");
-        });
-        dropzone.addEventListener("dragleave", () => {
-            dropzone.classList.remove("dragover");
-        });
-        dropzone.addEventListener("drop", (e) => {
-            e.preventDefault();
-            dropzone.classList.remove("dragover");
-            const files = e.dataTransfer.files;
-            if (files && files.length > 0) {
-                selectedFiles = Array.from(files);
-                showSelectedThumbnails();
-                logStatus(`${selectedFiles.length} files ready. Adjust settings, then click Render.`);
-                updateEstimate();
-            }
-        });
-
-        fileInput.addEventListener("change", () => {
-            const files = fileInput.files;
-            if (files && files.length > 0) {
-                selectedFiles = Array.from(files);
-                showSelectedThumbnails();
-                logStatus(`${selectedFiles.length} files ready. Adjust settings, then click Render.`);
-                updateEstimate();
-            }
-        });
-
-        // Toggle sky gradient inputs
-        const skyCheck = document.getElementById("use_sky_gradient");
-        const skyCol1 = document.getElementById("sky_col1");
-        const skyCol2 = document.getElementById("sky_col2");
-        skyCheck.addEventListener("change", (e) => {
-            const enabled = e.target.checked;
-            skyCol1.disabled = !enabled;
-            skyCol2.disabled = !enabled;
-        });
-
-        function toggleAdvancedPrompts() {
-            const isChecked = document.getElementById('advanced_toggle').checked;
-            document.getElementById('advanced_container').style.display = isChecked ? 'block' : 'none';
-        }
-        
-        function toggleFacadeSlider() {
-            const isChecked = document.getElementById('facade_gradient').checked;
-            document.getElementById('facade_container').style.display = isChecked ? 'block' : 'none';
-        }
-
-        function toggleGodRaysSlider() {
-            const isChecked = document.getElementById('god_rays').checked;
-            document.getElementById('god_rays_container').style.display = isChecked ? 'block' : 'none';
-        }
-
-        function toggleBloomSlider() {
-            const isChecked = document.getElementById('bloom_toggle').checked;
-            document.getElementById('bloom_container').style.display = isChecked ? 'block' : 'none';
-        }
-
-        document.getElementById("resolution").addEventListener("change", updateEstimate);
-        document.getElementById("all_times").addEventListener("change", updateEstimate);
-
-        function updateEstimate() {
-            const res = document.getElementById("resolution").value;
-            const allTimes = document.getElementById("all_times").checked;
-            const numImages = selectedFiles.length || 0;
-            if (numImages === 0) {
-                estimateEl.innerText = "";
-                return;
-            }
-
-            const baseCost = 0.05; // Base for 1K
-            let mult = 1.0;
-            if (res === "2K") mult = 1.5;
-            if (res === "4K") mult = 2.0;
-
-            let perImageCost = baseCost * mult;
-            let totalVariants = numImages;
-            if (allTimes) totalVariants *= 4; // Morning, Noon, Sunset, Night
-
-            const totalCost = (perImageCost * totalVariants).toFixed(2);
-            estimateEl.innerText = `Estimated cost: $${totalCost} (${totalVariants} images)`;
-        }
-
-        function showSelectedThumbnails() {
-            selectedPreview.innerHTML = "";
-            selectedFiles.forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = document.createElement("img");
-                    img.src = e.target.result;
-                    img.className = "preview-image";
-                    img.style.maxWidth = "150px"; 
-                    img.style.marginRight = "10px";
-                    selectedPreview.appendChild(img);
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // --- NEW Status Logging Function ---
-        function logStatus(msg, type="info") {
-            statusConsole.style.display = "block";
-            const line = document.createElement("div");
-            line.className = "status-line";
-            if (type === "error") line.classList.add("error");
-            if (type === "success") line.classList.add("success");
-            
-            // Add timestamp
-            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
-            line.innerText = `[${time}] ${msg}`;
-            
-            statusConsole.appendChild(line);
-            statusConsole.scrollTop = statusConsole.scrollHeight; // Auto-scroll
-        }
-
-        // --- NEW Render Button Logic (SSE) ---
-        renderBtn.addEventListener("click", async () => {
-            if (!selectedFiles.length) {
-                logStatus("No files selected. Drop or choose images first.", "error");
-                return;
-            }
-
-            // Clear previous
-            renderPreview.innerHTML = "";
-            statusConsole.innerHTML = ""; // Clear logs
-            logStatus("Initializing upload...");
-
-            renderBtn.disabled = true;
-            renderBtn.textContent = "Processing...";
-            progressContainer.style.display = "block";
-            progressBar.style.width = "1%"; // Start bar
-
-            const formData = new FormData();
-            for (let i = 0; i < selectedFiles.length; i++) {
-                formData.append("images", selectedFiles[i]);
-            }
-            formData.append("style", document.getElementById("style").value);
-            formData.append("lighting", document.getElementById("lighting").value);
-            formData.append("resolution", document.getElementById("resolution").value);
-            formData.append("strength", document.getElementById("strength").value);
-            formData.append("color_temp", document.getElementById("colortemp").value);
-            formData.append("contrast", document.getElementById("contrast").value);
-            formData.append("weather", document.getElementById("weather").value);
-            formData.append("cloud_type", document.getElementById("cloud_type").value);
-            formData.append("season", document.getElementById("season").value);
-            formData.append("outdir", document.getElementById("outdir").value);
-            formData.append("all_times", document.getElementById("all_times").checked ? "true" : "false");
-
-            // Sky Gradient
-            const useSky = document.getElementById("use_sky_gradient").checked;
-            formData.append("use_sky_gradient", useSky ? "true" : "false");
-            if (useSky) {
-                formData.append("sky_col1", document.getElementById("sky_col1").value);
-                formData.append("sky_col2", document.getElementById("sky_col2").value);
-            }
-
-            // Facade Gradient
-            const facadeGrad = document.getElementById("facade_gradient").checked;
-            const facadeVal = document.getElementById("facade_slider").value;
-            formData.append("facade_gradient", facadeGrad ? "true" : "false");
-            formData.append("facade_gradient_strength", facadeGrad ? facadeVal : 0);
-
-            // God Rays
-            const godRays = document.getElementById("god_rays").checked;
-            const godRaysVal = document.getElementById("god_rays_slider").value;
-            formData.append("god_rays", godRays ? "true" : "false");
-            formData.append("god_rays_strength", godRays ? godRaysVal : 0);
-
-            // Bloom Effect
-            const bloomEnabled = document.getElementById("bloom_toggle").checked;
-            const bloomVal = document.getElementById("bloom_slider").value;
-            formData.append("bloom_strength", bloomEnabled ? bloomVal : 0);
-
-            // Interior Lighting
-            const interiorLighting = document.getElementById("interior_lighting").checked;
-            formData.append("interior_lighting", interiorLighting ? "true" : "false");
-
-            formData.append("location", document.getElementById("location").value);
-            formData.append("camera_dir", document.getElementById("camera_dir").value);
-
-            // Advanced Prompts
-            const advancedEnabled = document.getElementById("advanced_toggle").checked;
-            if (advancedEnabled) {
-                formData.append("additional_prompt", document.getElementById("additional_prompt").value);
-                formData.append("negative_prompt", document.getElementById("negative_prompt").value);
-            }
-
-            try {
-                // 1. Start Job
-                const response = await fetch("/api/render", {
-                    method: "POST",
-                    body: formData,
-                });
-                const data = await response.json();
-
-                if (data.status === "started") {
-                    const jobId = data.job_id;
-                    logStatus(`Upload complete. Job ID: ${jobId}`);
-                    progressBar.style.width = "30%";
-
-                    // 2. Open Stream
-                    const evtSource = new EventSource(`/api/stream/${jobId}`);
-                    
-                    evtSource.onmessage = function(e) {
-                        // Ignore keepalives
-                        if (e.data === ": keepalive") return;
-
-                        const msg = JSON.parse(e.data);
-                        
-                        if (msg.type === "progress") {
-                            logStatus(msg.message);
-                            // Fake progress bump
-                            let currentW = parseFloat(progressBar.style.width);
-                            if (currentW < 90) progressBar.style.width = (currentW + 5) + "%";
-                        } else if (msg.type === "complete") {
-                            logStatus("Job Complete!", "success");
-                            progressBar.style.width = "100%";
-                            evtSource.close();
-                            
-                            // Render Results
-                            displayResults(msg.data, jobId); // Pass jobId for refinement
-
-                            renderBtn.disabled = false;
-                            renderBtn.textContent = "Render";
-                            setTimeout(() => { progressContainer.style.display = "none"; }, 1000);
-                        } else if (msg.type === "error") {
-                            logStatus("Error: " + msg.message, "error");
-                            evtSource.close();
-                            renderBtn.disabled = false;
-                            renderBtn.textContent = "Render";
-                        }
-                    };
-                    
-                    evtSource.onerror = function() {
-                        logStatus("Connection lost.", "error");
-                        evtSource.close();
-                        renderBtn.disabled = false;
-                        renderBtn.textContent = "Render";
-                    };
-                } else {
-                    logStatus("Error starting job: " + data.message, "error");
-                    renderBtn.disabled = false;
-                    renderBtn.textContent = "Render";
-                }
-
-            } catch (err) {
-                logStatus("Error: " + err, "error");
-                renderBtn.disabled = false;
-                renderBtn.textContent = "Render";
-            }
-        });
-
-        // ========== Video (Veo 3) Handler ==========
-        function normalizeOutputPath(p) {
-            if (!p) return '';
-            return p.startsWith('/') ? p : '/' + p;
-        }
-        
-        const videoBtn = document.getElementById("videoBtn");
-        const videoFile = document.getElementById("videoFile");
-        const videoStatus = document.getElementById("videoStatus");
-        const videoResult = document.getElementById("videoResult");
-        const videoPlayer = document.getElementById("videoPlayer");
-
-        videoBtn.addEventListener("click", async () => {
+videoBtn.addEventListener("click", async () => {
             // Validate file selected
             if (!videoFile.files || !videoFile.files[0]) {
                 videoStatus.style.display = "block";
@@ -1456,17 +1111,20 @@ const dropzone = document.getElementById("dropzone");
                             videoStatus.style.backgroundColor = "#d4edda";
                             videoStatus.style.color = "#155724";
                             let statusText = "Video generation complete!";
-                            if (msg.data && msg.data.cost_usd) {
-                                statusText += ` Cost: $${msg.data.cost_usd.toFixed(2)}`;
+                            // Backend contract: cost_usd (snake_case), with backward-compat fallback
+                            const costUsd = msg.data?.cost_usd ?? msg.data?.costusd;
+                            if (costUsd) {
+                                statusText += ` Cost: $${costUsd.toFixed(2)}`;
                             }
                             videoStatus.textContent = statusText;
                             
                             // Render artifact based on type
                             if (msg.data && msg.data.video) {
-                                // Normalize path to ensure it starts with /
+                                // Backend contract: msg.data.video is already a normalized /output/... URL
+                                // normalizeOutputPath() is kept only as a backward-compat safety net
                                 const videoPath = normalizeOutputPath(msg.data.video);
-                                // Primary path: use artifact_type from backend (backend contract should always emit this)
-                                let artifactType = msg.data.artifact_type;
+                                // Backend contract: artifact_type (snake_case), with backward-compat fallback
+                                let artifactType = msg.data.artifact_type ?? msg.data.artifacttype;
                                 if (!artifactType) {
                                     // Fallback: infer from file extension if artifact_type missing
                                     // TODO: Remove this fallback once backend contract is enforced (backend should always emit artifact_type)
@@ -1686,9 +1344,341 @@ const dropzone = document.getElementById("dropzone");
                 inpaintBox.className = "refine-box";
                 inpaintBox.style.marginTop = "15px";
                 inpaintBox.style.borderTop = "1px solid #ddd";
-                inpaintBox.style.paddingTop = "
+                inpaintBox.style.paddingTop = "10px";
 
-[TRUNCATED - Excerpt was 140237 characters, showing first 30,000 characters]
+                const inpaintLabel = document.createElement("label");
+                inpaintLabel.style.display = "block";
+                inpaintLabel.style.marginBottom = "5px";
+                inpaintLabel.style.fontWeight = "bold";
+                inpaintLabel.innerHTML = '<i class="fa-solid fa-paintbrush"></i> In-Paint (Draw Mask)';
+                inpaintBox.appendChild(inpaintLabel);
+
+                const instructionText = document.createElement("p");
+                instructionText.style.fontSize = "12px";
+                instructionText.style.color = "var(--subtitle-color)";
+                instructionText.style.marginBottom = "10px";
+                instructionText.style.marginTop = "0";
+                instructionText.innerHTML = "💡 Draw on the image below to mark areas for editing (white = edit, black = preserve)";
+                inpaintBox.appendChild(instructionText);
+
+                // Create canvas drawing area
+                const canvasContainer = document.createElement("div");
+                canvasContainer.style.position = "relative";
+                canvasContainer.style.marginBottom = "10px";
+                canvasContainer.style.border = "2px solid var(--border-color)";
+                canvasContainer.style.borderRadius = "8px";
+                canvasContainer.style.overflow = "hidden";
+                canvasContainer.style.backgroundColor = "#000";
+                canvasContainer.id = `canvas-container-${jobId}`;
+
+                // Preview image
+                const previewImg = document.createElement("img");
+                previewImg.src = "/" + imgData.image;
+                previewImg.style.width = "100%";
+                previewImg.style.height = "auto";
+                previewImg.style.display = "block";
+                previewImg.id = `preview-img-${jobId}`;
+                previewImg.onload = function() {
+                    const canvas = document.getElementById(`mask-canvas-${jobId}`);
+                    if (canvas) {
+                        canvas.width = this.naturalWidth;
+                        canvas.height = this.naturalHeight;
+                        canvas.style.width = "100%";
+                        canvas.style.height = "auto";
+                    }
+                };
+                canvasContainer.appendChild(previewImg);
+
+                // Canvas for drawing mask
+                const maskCanvas = document.createElement("canvas");
+                maskCanvas.id = `mask-canvas-${jobId}`;
+                maskCanvas.style.position = "absolute";
+                maskCanvas.style.top = "0";
+                maskCanvas.style.left = "0";
+                maskCanvas.style.width = "100%";
+                maskCanvas.style.height = "100%";
+                maskCanvas.style.cursor = "crosshair";
+                maskCanvas.style.opacity = "0.5";
+                canvasContainer.appendChild(maskCanvas);
+
+                // Drawing tools
+                const toolsDiv = document.createElement("div");
+                toolsDiv.className = "drawing-tools";
+
+                // Brush button
+                const brushBtn = document.createElement("button");
+                brushBtn.className = "btn-small";
+                brushBtn.innerHTML = '<i class="fa-solid fa-paintbrush"></i> Brush';
+                brushBtn.id = `brush-btn-${jobId}`;
+                brushBtn.style.backgroundColor = "#6366f1";
+                brushBtn.style.color = "white";
+                toolsDiv.appendChild(brushBtn);
+
+                // Eraser button
+                const eraserBtn = document.createElement("button");
+                eraserBtn.className = "btn-small";
+                eraserBtn.innerHTML = '<i class="fa-solid fa-eraser"></i> Eraser';
+                eraserBtn.id = `eraser-btn-${jobId}`;
+                toolsDiv.appendChild(eraserBtn);
+
+                // Clear button
+                const clearBtn = document.createElement("button");
+                clearBtn.className = "btn-small";
+                clearBtn.innerHTML = '<i class="fa-solid fa-trash"></i> Clear';
+                clearBtn.id = `clear-btn-${jobId}`;
+                toolsDiv.appendChild(clearBtn);
+
+                // Brush size slider
+                const sizeLabel = document.createElement("label");
+                sizeLabel.style.marginLeft = "10px";
+                sizeLabel.style.fontSize = "12px";
+                sizeLabel.innerHTML = 'Brush Size: <span id="brush-size-val-' + jobId + '">20</span>px';
+                toolsDiv.appendChild(sizeLabel);
+
+                const sizeSlider = document.createElement("input");
+                sizeSlider.type = "range";
+                sizeSlider.min = "5";
+                sizeSlider.max = "100";
+                sizeSlider.value = "20";
+                sizeSlider.style.width = "100px";
+                sizeSlider.id = `brush-size-${jobId}`;
+                sizeSlider.oninput = function() {
+                    document.getElementById(`brush-size-val-${jobId}`).textContent = this.value;
+                };
+                toolsDiv.appendChild(sizeSlider);
+
+                inpaintBox.appendChild(toolsDiv);
+                inpaintBox.appendChild(canvasContainer);
+
+                // Initialize canvas drawing
+                let isDrawing = false;
+                let currentTool = 'brush';
+                let brushSize = 20;
+
+                function initCanvas() {
+                    const img = previewImg;
+                    if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                        // Image not loaded yet, wait
+                        setTimeout(initCanvas, 100);
+                        return;
+                    }
+                    
+                    // Set canvas to match image dimensions
+                    maskCanvas.width = img.naturalWidth;
+                    maskCanvas.height = img.naturalHeight;
+                    
+                    // Set canvas display size to match image display size
+                    const imgRect = img.getBoundingClientRect();
+                    maskCanvas.style.width = imgRect.width + "px";
+                    maskCanvas.style.height = imgRect.height + "px";
+                    
+                    const ctx = maskCanvas.getContext('2d');
+                    ctx.fillStyle = 'white';
+                    ctx.strokeStyle = 'white';
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.globalCompositeOperation = 'source-over';
+                }
+
+                function updateCanvasDisplaySize() {
+                    if (maskCanvas.width === 0 || maskCanvas.height === 0) return;
+                    const imgRect = previewImg.getBoundingClientRect();
+                    maskCanvas.style.width = imgRect.width + "px";
+                    maskCanvas.style.height = imgRect.height + "px";
+                }
+
+                previewImg.onload = function() {
+                    initCanvas();
+                    updateCanvasDisplaySize();
+                };
+                if (previewImg.complete) {
+                    initCanvas();
+                    setTimeout(updateCanvasDisplaySize, 100);
+                }
+                
+                // Update canvas display size on window resize
+                const resizeObserver = new ResizeObserver(() => {
+                    updateCanvasDisplaySize();
+                });
+                resizeObserver.observe(canvasContainer);
+
+                function getEventPos(e) {
+                    const rect = maskCanvas.getBoundingClientRect();
+                    const scaleX = maskCanvas.width / rect.width;
+                    const scaleY = maskCanvas.height / rect.height;
+                    const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+                    const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+                    return {
+                        x: (clientX - rect.left) * scaleX,
+                        y: (clientY - rect.top) * scaleY
+                    };
+                }
+
+                function startDrawing(e) {
+                    isDrawing = true;
+                    maskCanvas.classList.add('drawing');
+                    const ctx = maskCanvas.getContext('2d');
+                    const pos = getEventPos(e);
+                    ctx.beginPath();
+                    ctx.moveTo(pos.x, pos.y);
+                }
+
+                function draw(e) {
+                    if (!isDrawing) return;
+                    e.preventDefault();
+                    const ctx = maskCanvas.getContext('2d');
+                    const pos = getEventPos(e);
+                    ctx.lineWidth = brushSize;
+                    ctx.lineTo(pos.x, pos.y);
+                    ctx.stroke();
+                }
+
+                function stopDrawing() {
+                    if (isDrawing) {
+                        isDrawing = false;
+                        maskCanvas.classList.remove('drawing');
+                    }
+                }
+
+                maskCanvas.addEventListener('mousedown', startDrawing);
+                maskCanvas.addEventListener('mousemove', draw);
+                maskCanvas.addEventListener('mouseup', stopDrawing);
+                maskCanvas.addEventListener('mouseleave', stopDrawing);
+
+                // Touch support
+                maskCanvas.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const mouseEvent = new MouseEvent('mousedown', {
+                        clientX: touch.clientX,
+                        clientY: touch.clientY
+                    });
+                    maskCanvas.dispatchEvent(mouseEvent);
+                });
+
+                maskCanvas.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    const mouseEvent = new MouseEvent('mousemove', {
+                        clientX: touch.clientX,
+                        clientY: touch.clientY
+                    });
+                    maskCanvas.dispatchEvent(mouseEvent);
+                });
+
+                maskCanvas.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    const mouseEvent = new MouseEvent('mouseup', {});
+                    maskCanvas.dispatchEvent(mouseEvent);
+                });
+
+                brushBtn.onclick = () => {
+                    currentTool = 'brush';
+                    const ctx = maskCanvas.getContext('2d');
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.strokeStyle = 'white';
+                    ctx.fillStyle = 'white';
+                    brushBtn.classList.add('active');
+                    eraserBtn.classList.remove('active');
+                };
+
+                eraserBtn.onclick = () => {
+                    currentTool = 'eraser';
+                    const ctx = maskCanvas.getContext('2d');
+                    ctx.globalCompositeOperation = 'destination-out';
+                    eraserBtn.classList.add('active');
+                    brushBtn.classList.remove('active');
+                };
+                
+                // Set brush as default active
+                brushBtn.classList.add('active');
+
+                clearBtn.onclick = () => {
+                    const ctx = maskCanvas.getContext('2d');
+                    ctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+                };
+
+                sizeSlider.oninput = function() {
+                    brushSize = parseInt(this.value);
+                    document.getElementById(`brush-size-val-${jobId}`).textContent = this.value;
+                };
+
+                // Store canvas reference for later use
+                maskCanvas.dataset.jobId = jobId;
+
+                const inpaintPrompt = document.createElement("textarea");
+                inpaintPrompt.className = "refine-textarea";
+                inpaintPrompt.placeholder = "e.g. Add a tree here, remove the car, add clouds...";
+                inpaintPrompt.style.marginBottom = "10px";
+                inpaintBox.appendChild(inpaintPrompt);
+
+                const editModeSelect = document.createElement("select");
+                editModeSelect.style.marginBottom = "10px";
+                editModeSelect.style.width = "100%";
+                editModeSelect.style.padding = "5px";
+                const option1 = document.createElement("option");
+                option1.value = "EDIT_MODE_INPAINT_INSERTION";
+                option1.text = "Insert New Content";
+                const option2 = document.createElement("option");
+                option2.value = "EDIT_MODE_INPAINT_REMOVAL";
+                option2.text = "Remove Content";
+                editModeSelect.appendChild(option1);
+                editModeSelect.appendChild(option2);
+                inpaintBox.appendChild(editModeSelect);
+
+                const inpaintBtn = document.createElement("button");
+                inpaintBtn.className = "btn-primary btn-primary-secondary";
+                inpaintBtn.innerHTML = '<i class="fa-solid fa-paintbrush"></i> In-Paint';
+                inpaintBtn.onclick = () => runInpaint("/" + imgData.image, maskCanvas, inpaintPrompt.value, editModeSelect.value, inpaintBox);
+                inpaintBox.appendChild(inpaintBtn);
+
+                wrapper.appendChild(refineBox);
+                wrapper.appendChild(inpaintBox);
+                renderPreview.appendChild(wrapper);
+            });
+        }
+
+        // --- Handle In-paint Again ---
+        function handleInpaintAgain(containerElement, maskCanvas, canvasContainer, previewImg) {
+            const resultImageUrl = containerElement.dataset.resultImage;
+            if (!resultImageUrl) {
+                console.error("No result image found for in-paint again");
+                return;
+            }
+
+            // Update base image to use the result image
+            if (previewImg) {
+                previewImg.src = resultImageUrl;
+                // Update canvas size when new image loads
+                previewImg.onload = function() {
+                    if (maskCanvas) {
+                        const ctx = maskCanvas.getContext('2d');
+                        maskCanvas.width = this.naturalWidth;
+                        maskCanvas.height = this.naturalHeight;
+                        ctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+                        
+                        // Update canvas container size if needed
+                        if (canvasContainer) {
+                            const computedStyle = window.getComputedStyle(previewImg);
+                            maskCanvas.style.width = computedStyle.width;
+                            maskCanvas.style.height = computedStyle.height;
+                        }
+                    }
+                };
+            }
+
+            // Clear the mask canvas
+            if (maskCanvas) {
+                const ctx = maskCanvas.getContext('2d');
+                ctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+            }
+
+            // Update stored base image URL for future in-paint calls
+            containerElement.dataset.currentBaseImage = resultImageUrl;
+
+            // Update the In-Paint button's onclick to use the new base im
+
+[TRUNCATED - Excerpt was 142110 characters, prioritized Video handler section]
 ```
 
 ### .env

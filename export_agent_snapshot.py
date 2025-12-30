@@ -473,6 +473,8 @@ def extract_html_js_excerpt(html_content: str) -> str:
         'dropzone', 'fileInput', 'selectedPreview', 'renderPreview',
         # Mashup controls
         'mashupBtn', 'mashupStatus', 'mashupPreview', 'mashupResolution', 'mashupCost',
+        # Video (Veo 3) controls
+        'videoBtn', 'videoFile', 'videoStatus', 'videoResult', 'videoPlayer', 'videoShotPreset', 'videoDuration', 'videoFps', 'videoAspect',
         # Location/map
         'mapModal', 'openMapBtn', 'confirmLocBtn', 'location',
         # Advanced options
@@ -848,14 +850,40 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
                 sections.append("")
             elif file_rel_path == 'templates/index.html':
                 # Special handling for templates/index.html: extract JS and key HTML elements
+                # Note: Reads from current file on disk (working tree at HEAD), not cached
                 sections.append("### templates/index.html (JS excerpt)")
                 sections.append("")
                 try:
+                    # Read current file content from disk (ensures we get latest version from working tree, not cached)
                     html_content = file_path.read_text(encoding='utf-8', errors='replace')
                     content = extract_html_js_excerpt(html_content)
-                    # Cap at 30,000 chars as per requirement
-                    if len(content) > 30000:
-                        content = content[:30000] + f"\n\n[TRUNCATED - Excerpt was {len(content)} characters, showing first 30,000 characters]"
+                    # Cap at 30,000 chars as per requirement, but prioritize Video handler section if present
+                    original_length = len(content)
+                    if original_length > 30000:
+                        # Try to find and prioritize Video handler section (look for videoBtn handler)
+                        video_marker = content.find('videoBtn.addEventListener')
+                        if video_marker >= 0:
+                            # Video handler found - include it even if we need to truncate elsewhere
+                            # Find the end of the Video handler (look for next major handler or end of script)
+                            video_end_markers = [
+                                content.find('\n        // ==========', video_marker + 1000),  # Next major section
+                                content.find('\n        const ', video_marker + 1000),  # Next const declaration
+                                content.find('</script>', video_marker),  # End of script block
+                            ]
+                            video_end = min([pos for pos in video_end_markers if pos >= video_marker + 500], default=video_marker + 5000)
+                            video_section = content[video_marker:video_end]
+                            # Include Video section + content before it (up to limit)
+                            remaining = 30000 - len(video_section)
+                            if remaining > 1000:
+                                pre_content = content[:video_marker][-remaining:]
+                                content = pre_content + video_section
+                            else:
+                                # Just include Video section if it's too large
+                                content = video_section[:30000]
+                            content += f"\n\n[TRUNCATED - Excerpt was {original_length} characters, prioritized Video handler section]"
+                        else:
+                            # No Video handler marker found, use standard truncation
+                            content = content[:30000] + f"\n\n[TRUNCATED - Excerpt was {original_length} characters, showing first 30,000 characters]"
                     sections.append("```html")
                     sections.append(content)
                     sections.append("```")
@@ -930,6 +958,40 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
     return '\n'.join(sections)
 
 
+def validate_snapshot_content(snapshot_content: str) -> None:
+    """
+    Validate that the snapshot content contains required tokens for video endpoint contract.
+    
+    Raises SystemExit with non-zero code if validation fails.
+    """
+    missing_tokens = []
+    
+    # Check for cost_usd (snake_case) - required for video endpoint
+    if 'cost_usd' not in snapshot_content:
+        missing_tokens.append('cost_usd')
+    
+    # Check for artifact_type (snake_case) - required for video endpoint
+    if 'artifact_type' not in snapshot_content:
+        missing_tokens.append('artifact_type')
+    
+    # Check for /output/ path pattern - required for video artifact URL
+    if '/output/' not in snapshot_content:
+        missing_tokens.append('/output/')
+    
+    if missing_tokens:
+        error_msg = (
+            f"[VALIDATION ERROR] Snapshot is missing required tokens for video endpoint contract:\n"
+            f"  Missing: {', '.join(missing_tokens)}\n"
+            f"\n"
+            f"This likely indicates:\n"
+            f"  - Video handler section was truncated or not included\n"
+            f"  - Video job completion example is missing required fields\n"
+            f"  - Snapshot extraction logic needs adjustment\n"
+        )
+        print(error_msg, file=sys.stderr)
+        sys.exit(1)
+
+
 def main():
     """Main entry point with CLI argument parsing."""
     parser = argparse.ArgumentParser(
@@ -982,6 +1044,10 @@ def main():
     
     try:
         snapshot_content = generate_snapshot(project_root, max_file_length)
+        
+        # Validate snapshot content before writing
+        validate_snapshot_content(snapshot_content)
+        
         output_file.write_text(snapshot_content, encoding='utf-8')
         print(f"[OK] Snapshot written to: {output_file}")
         print()
