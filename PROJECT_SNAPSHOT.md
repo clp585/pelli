@@ -2,7 +2,7 @@
 
 ## Build Identity
 
-**Generated:** 2025-12-30 13:02:33
+**Generated:** 2025-12-30 13:03:46
 **Source Path:** C:\Users\cperez.PELLI\Desktop\AI Lighting Agent
 
 ## Repo Tree
@@ -48,6 +48,8 @@
 │   ├── tsconfig.json
 │   ├── tsconfig.node.json
 │   └── vite.config.ts
+├── scripts/
+│   └── precommit_snapshot.ps1
 ├── storage/
 │   ├── cache/
 │   ├── costs.json
