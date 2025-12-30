@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt
+        fi
+    
+    - name: Generate PROJECT_SNAPSHOT.md
+      run: python export_agent_snapshot.py --out PROJECT_SNAPSHOT.md
+    
+    - name: Check PROJECT_SNAPSHOT.md is up to date
+      run: |
+        if ! git diff --exit-code PROJECT_SNAPSHOT.md; then
+          echo "::error::PROJECT_SNAPSHOT.md is out of date. Please run the following command locally and recommit:"
+          echo "  python export_agent_snapshot.py --out PROJECT_SNAPSHOT.md"
+          echo "  git add PROJECT_SNAPSHOT.md"
+          echo "  git commit -m 'Update PROJECT_SNAPSHOT.md'"
+          exit 1
+        fi
+    
+    - name: Run smoke tests
+      run: python scripts/smoke_test.py
+
