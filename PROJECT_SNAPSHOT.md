@@ -20,7 +20,7 @@ Standard wiring pattern used in this project:
 
 ## Build Identity
 
-**Generated (Timestamp):** 2025-12-30 15:26:57
+**Generated (Timestamp):** 2025-12-30 15:35:46
 **Source Path:** <REPO_ROOT>
 
 ## Repo Tree
@@ -72,7 +72,8 @@ Standard wiring pattern used in this project:
 │   ├── hooks/
 │   ├── install_git_hooks.py
 │   ├── precommit_snapshot.ps1
-│   └── smoke_test.py
+│   ├── smoke_test.py
+│   └── smoke_test_video_contract.py
 ├── storage/
 │   ├── cache/
 │   ├── costs.json
@@ -631,7 +632,7 @@ def process_refine_job(new_job_id, original_job_id, feedback):
                     resolution=original_entry.get("resolution", "4K"),
             
 
-[TRUNCATED - Original file was 42574 characters, showing first 12000 characters]
+[TRUNCATED - Original file was 43120 characters, showing first 12000 characters]
 ```
 
 *Note: File content truncated to 12,000 characters*
@@ -1464,12 +1465,11 @@ const dropzone = document.getElementById("dropzone");
                             if (msg.data && msg.data.video) {
                                 // Normalize path to ensure it starts with /
                                 const videoPath = normalizeOutputPath(msg.data.video);
-                                // Use artifact_type if present (backend should always emit this)
-                                // Fallback inference is only for backward compatibility during transition
+                                // Primary path: use artifact_type from backend (backend contract should always emit this)
                                 let artifactType = msg.data.artifact_type;
                                 if (!artifactType) {
-                                    // Backward compatibility: infer from file extension if artifact_type missing
-                                    // TODO: Remove this fallback once backend contract is guaranteed
+                                    // Fallback: infer from file extension if artifact_type missing
+                                    // TODO: Remove this fallback once backend contract is enforced (backend should always emit artifact_type)
                                     artifactType = videoPath.toLowerCase().endsWith('.mp4') ? 'video' : 'file';
                                 }
                                 
@@ -1685,9 +1685,10 @@ const dropzone = document.getElementById("dropzone");
                 const inpaintBox = document.createElement("div");
                 inpaintBox.className = "refine-box";
                 inpaintBox.style.marginTop = "15px";
-                inpaintBox.style.borderTop = "1px solid
+                inpaintBox.style.borderTop = "1px solid #ddd";
+                inpaintBox.style.paddingTop = "
 
-[TRUNCATED - Excerpt was 140292 characters, showing first 30,000 characters]
+[TRUNCATED - Excerpt was 140237 characters, showing first 30,000 characters]
 ```
 
 ### .env

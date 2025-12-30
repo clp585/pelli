@@ -1773,12 +1773,11 @@
                             if (msg.data && msg.data.video) {
                                 // Normalize path to ensure it starts with /
                                 const videoPath = normalizeOutputPath(msg.data.video);
-                                // Use artifact_type if present (backend should always emit this)
-                                // Fallback inference is only for backward compatibility during transition
+                                // Primary path: use artifact_type from backend (backend contract should always emit this)
                                 let artifactType = msg.data.artifact_type;
                                 if (!artifactType) {
-                                    // Backward compatibility: infer from file extension if artifact_type missing
-                                    // TODO: Remove this fallback once backend contract is guaranteed
+                                    // Fallback: infer from file extension if artifact_type missing
+                                    // TODO: Remove this fallback once backend contract is enforced (backend should always emit artifact_type)
                                     artifactType = videoPath.toLowerCase().endsWith('.mp4') ? 'video' : 'file';
                                 }
                                 

@@ -553,6 +553,8 @@ def process_video_job(job_id, image_path, options):
         output_folder = options.get('base_output_folder', OUTPUT_FOLDER)
         
         # Call the video generation function
+        # generate_veo_video() returns (filename, cost_usd) where filename is just the basename
+        # (e.g., "veo_stub_<job_id>.txt") - tool code is independent of HTTP routing conventions
         video_filename, cost_usd = generate_veo_video(
             image_path=image_path,
             shot_preset=shot_preset,
@@ -564,21 +566,26 @@ def process_video_job(job_id, image_path, options):
             job_id=job_id,
         )
         
-        # Normalize to canonical /output/<filename> URL format
-        # Handles cases: "filename.txt", "output/filename.txt", "/output/filename.txt", or absolute paths
+        # Construct canonical /output/<filename> URL from the returned filename
         # This ensures data.video always starts with /output/ per the canonical public path contract
+        # Defensive normalization handles edge cases (though stub always returns just filename)
         if video_filename.startswith('/output/'):
             # Already in correct format
             video_url = video_filename
         elif video_filename.startswith('output/'):
-            # Missing leading slash
-            video_url = f"/{video_filename}"
-        elif os.path.isabs(video_filename) or os.sep in video_filename or (os.altsep and os.altsep in video_filename):
-            # Absolute path or contains path separators - extract just the filename
+            # Strip "output/" prefix and add leading slash: output/foo.txt -> /output/foo.txt
+            filename = video_filename[len('output/'):]
+            video_url = f"/output/{filename}"
+        elif os.path.isabs(video_filename):
+            # Absolute path: extract basename and return /output/<basename>
+            filename = os.path.basename(video_filename)
+            video_url = f"/output/{filename}"
+        elif os.sep in video_filename or (os.altsep and os.altsep in video_filename):
+            # Contains path separators: extract basename and return /output/<basename>
             filename = os.path.basename(video_filename)
             video_url = f"/output/{filename}"
         else:
-            # Just a filename (expected case)
+            # Just a filename (expected case from stub): construct /output/<filename>
             video_url = f"/output/{video_filename}"
         
         # Determine artifact type and MIME type based on filename extension
