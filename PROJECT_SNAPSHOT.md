@@ -1,8 +1,14 @@
 # Project Snapshot
 
+## How to use this snapshot
+
+- **For UI changes:** paste the `templates/index.html (JS excerpt)` section
+- **For backend changes:** paste API Inventory + the relevant route excerpt
+- **For new controls:** paste Options Schema
+
 ## Build Identity
 
-**Generated (Timestamp):** 2025-12-30 13:34:21
+**Generated (Timestamp):** 2025-12-30 13:48:28
 **Source Path:** <REPO_ROOT>
 
 ## Repo Tree
@@ -171,6 +177,65 @@
 - `style`
 - `use_sky_gradient`
 - `weather`
+
+## Job Streaming Protocol
+
+### Endpoint
+
+`GET /api/stream/<job_id>` - Server-Sent Events (SSE) endpoint for streaming job status updates.
+
+### Event Types
+
+Jobs emit three types of events via the queue:
+
+#### 1. Progress Events
+
+```json
+{"type": "progress", "message": "[filename.jpg | night] 🚀 Starting render..."}
+```
+
+**Client behavior**: Update status text/log, continue polling.
+
+#### 2. Complete Events
+
+Render job completion:
+```json
+{"type": "complete", "data": {"status": "success", "images": [...], "total_cost_usd": 0.20, "settings": {...}}}
+```
+
+Refine/Inpaint/Preview completion:
+```json
+{"type": "complete", "data": {"status": "success", "image": "/output/path.jpg", "cost_usd": 0.05}}
+```
+
+**Client behavior**: Render results (images/data), stop polling/stream, close EventSource.
+
+#### 3. Error Events
+
+```json
+{"type": "error", "message": "Job failed: error description"}
+```
+
+**Client behavior**: Display error message, stop polling/stream, close EventSource.
+
+### Notes
+
+- Stream closes automatically after `complete` or `error` events.
+- Keepalive comments (`: keepalive`) are sent every 30s to maintain connection.
+- Job queue expires after 1 hour (TTL).
+
+## Static File Serving (Inputs/Outputs)
+
+### Routes
+
+| Route | Serves From | Purpose |
+|-------|-------------|---------|
+| `/input/<path:filename>` | `input/` (upload folder) | Original uploaded images for before/after comparison slider |
+| `/output/<path:filename>` | `output/` (output folder) | Generated result images displayed in the UI |
+
+**Usage notes:**
+- `/input/` serves original uploaded images (stored in `UPLOAD_FOLDER`).
+- `/output/` serves generated/processed images (stored in `OUTPUT_FOLDER`).
 
 ## Options Schema
 
@@ -928,28 +993,24 @@ google-genai>=1.0.0
 
 ```
 
-### templates/index.html
+### templates/index.html (JS excerpt)
 
-```
-html
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Lighting Agent</title>
-    <!-- Import image comparison slider -->
-    <script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/styles.css" />
+```html
+<!-- JavaScript Excerpt (script tags and key HTML elements) -->
 
-    <!-- Leaflet Map Library with fallback -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
-          crossorigin="" />
-    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" 
+<!-- ========== JavaScript Code ========== -->
+
+<!-- Script block 1 -->
+<script defer src="https://cdn.jsdelivr.net/npm/img-comparison-slider@8/dist/index.js"></script>
+
+<!-- Script block 2 -->
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" 
             crossorigin="anonymous"
             onerror="loadLeafletFallback();"
             onload="window.leafletLoaded = true;"></script>
-    <script>
+
+<!-- Script block 3 -->
+<script>
         // Fallback loader if primary CDN fails
         function loadLeafletFallback() {
             console.warn('Primary Leaflet CDN (jsdelivr) failed, trying fallback (unpkg)...');
@@ -992,320 +1053,608 @@ html
         });
     </script>
 
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Script block 4 -->
+<script>
+        const dropzone = document.getElementById("dropzone");
+        const fileInput = document.getElementById("fileInput");
+        const estimateEl = document.getElementById("estimate");
+        const selectedPreview = document.getElementById("selectedPreview");
+        const renderPreview = document.getElementById("renderPreview");
+        const renderBtn = document.getElementById("renderBtn");
+        const progressContainer = document.getElementById("progressContainer");
+        const progressBar = document.getElementById("progressBar");
 
-    <style>
-        /* --- THEME VARIABLES --- */
-        :root {
-            --bg-color: #ffffff;
-            --text-color: #000000;
-            --subtitle-color: #666666;
-            --input-bg: #ffffff;
-            --input-text: #000000;
-            --border-color: #aaaaaa;
+        // Status Console
+        const statusConsole = document.getElementById("status-console");
+
+        const mashupBtn = document.getElementById("mashupBtn");
+        const mashupStatus = document.getElementById("mashupStatus");
+        const mashupPreview = document.getElementById("mashupPreview");
+        const mashupResolution = document.getElementById("mashupResolution");
+        const mashupCost = document.getElementById("mashupCost");
+
+        // MAP VARIABLES
+        const mapModal = document.getElementById("mapModal");
+        const openMapBtn = document.getElementById("openMapBtn");
+        const closeModal = document.querySelector(".close-modal");
+        const confirmLocBtn = document.getElementById("confirmLocBtn");
+        const locationInput = document.getElementById("location");
+        let map = null;
+        let currentMarker = null;
+
+        let selectedFiles = [];
+
+        dropzone.addEventListener("click", () => fileInput.click());
+
+        dropzone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropzone.classList.add("dragover");
+        });
+        dropzone.addEventListener("dragleave", () => {
+            dropzone.classList.remove("dragover");
+        });
+        dropzone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dropzone.classList.remove("dragover");
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                selectedFiles = Array.from(files);
+                showSelectedThumbnails();
+                logStatus(`${selectedFiles.length} files ready. Adjust settings, then click Render.`);
+                updateEstimate();
+            }
+        });
+
+        fileInput.addEventListener("change", () => {
+            const files = fileInput.files;
+            if (files && files.length > 0) {
+                selectedFiles = Array.from(files);
+                showSelectedThumbnails();
+                logStatus(`${selectedFiles.length} files ready. Adjust settings, then click Render.`);
+                updateEstimate();
+            }
+        });
+
+        // Toggle sky gradient inputs
+        const skyCheck = document.getElementById("use_sky_gradient");
+        const skyCol1 = document.getElementById("sky_col1");
+        const skyCol2 = document.getElementById("sky_col2");
+        skyCheck.addEventListener("change", (e) => {
+            const enabled = e.target.checked;
+            skyCol1.disabled = !enabled;
+            skyCol2.disabled = !enabled;
+        });
+
+        function toggleAdvancedPrompts() {
+            const isChecked = document.getElementById('advanced_toggle').checked;
+            document.getElementById('advanced_container').style.display = isChecked ? 'block' : 'none';
+        }
+        
+        function toggleFacadeSlider() {
+            const isChecked = document.getElementById('facade_gradient').checked;
+            document.getElementById('facade_container').style.display = isChecked ? 'block' : 'none';
+        }
+
+        function toggleGodRaysSlider() {
+            const isChecked = document.getElementById('god_rays').checked;
+            document.getElementById('god_rays_container').style.display = isChecked ? 'block' : 'none';
+        }
+
+        function toggleBloomSlider() {
+            const isChecked = document.getElementById('bloom_toggle').checked;
+            document.getElementById('bloom_container').style.display = isChecked ? 'block' : 'none';
+        }
+
+        document.getElementById("resolution").addEventListener("change", updateEstimate);
+        document.getElementById("all_times").addEventListener("change", updateEstimate);
+
+        function updateEstimate() {
+            const res = document.getElementById("resolution").value;
+            const allTimes = document.getElementById("all_times").checked;
+            const numImages = selectedFiles.length || 0;
+            if (numImages === 0) {
+                estimateEl.innerText = "";
+                return;
+            }
+
+            const baseCost = 0.05; // Base for 1K
+            let mult = 1.0;
+            if (res === "2K") mult = 1.5;
+            if (res === "4K") mult = 2.0;
+
+            let perImageCost = baseCost * mult;
+            let totalVariants = numImages;
+            if (allTimes) totalVariants *= 4; // Morning, Noon, Sunset, Night
+
+            const totalCost = (perImageCost * totalVariants).toFixed(2);
+            estimateEl.innerText = `Estimated cost: $${totalCost} (${totalVariants} images)`;
+        }
+
+        function showSelectedThumbnails() {
+            selectedPreview.innerHTML = "";
+            selectedFiles.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.className = "preview-image";
+                    img.style.maxWidth = "150px"; 
+                    img.style.marginRight = "10px";
+                    selectedPreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // --- NEW Status Logging Function ---
+        function logStatus(msg, type="info") {
+            statusConsole.style.display = "block";
+            const line = document.createElement("div");
+            line.className = "status-line";
+            if (type === "error") line.classList.add("error");
+            if (type === "success") line.classList.add("success");
             
-            --dropzone-bg: #ffffff;
-            --dropzone-text: #555555;
-            --dropzone-hover-bg: #f0f7ff;
-            --dropzone-hover-border: #0078ff;
-
-            --mashup-bg: #fafafa;
-            --modal-bg: #fefefe;
-            --modal-text: #000000;
-
-            --status-console-bg: #f5f5f5;
-            --status-console-text: #333;
-        }
-
-        /* DARK MODE OVERRIDES */
-        [data-theme="dark"] {
-            --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --subtitle-color: #aaaaaa;
-            --input-bg: #333333;
-            --input-text: #ffffff;
-            --border-color: #555555;
+            // Add timestamp
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            line.innerText = `[${time}] ${msg}`;
             
-            --dropzone-bg: #2d2d2d;
-            --dropzone-text: #cccccc;
-            --dropzone-hover-bg: #333333;
-            --dropzone-hover-border: #4dabf7;
-
-            --mashup-bg: #252525;
-            --modal-bg: #2d2d2d;
-            --modal-text: #ffffff;
-
-            --status-console-bg: #111;
-            --status-console-text: #0f0;
+            statusConsole.appendChild(line);
+            statusConsole.scrollTop = statusConsole.scrollHeight; // Auto-scroll
         }
 
-        /* MATRIX GREEN MODE OVERRIDES ... */
-        body.green-mode {
-            --text-color: #00ff41 !important;
-            --subtitle-color: #008f11 !important;
-            --input-text: #00ff41 !important;
-            --input-bg: #0d0208 !important;
-            --dropzone-text: #00ff41 !important;
-            --modal-text: #00ff41 !important;
-            --border-color: #003b00 !important;
-            --dropzone-hover-border: #00ff41 !important;
-            --status-console-text: #00ff41 !important;
+        // --- NEW Render Button Logic (SSE) ---
+        renderBtn.addEventListener("click", async () => {
+            if (!selectedFiles.length) {
+                logStatus("No files selected. Drop or choose images first.", "error");
+                return;
+            }
+
+            // Clear previous
+            renderPreview.innerHTML = "";
+            statusConsole.innerHTML = ""; // Clear logs
+            logStatus("Initializing upload...");
+
+            renderBtn.disabled = true;
+            renderBtn.textContent = "Processing...";
+            progressContainer.style.display = "block";
+            progressBar.style.width = "1%"; // Start bar
+
+            const formData = new FormData();
+            for (let i = 0; i < selectedFiles.length; i++) {
+                formData.append("images", selectedFiles[i]);
+            }
+            formData.append("style", document.getElementById("style").value);
+            formData.append("lighting", document.getElementById("lighting").value);
+            formData.append("resolution", document.getElementById("resolution").value);
+            formData.append("strength", document.getElementById("strength").value);
+            formData.append("color_temp", document.getElementById("colortemp").value);
+            formData.append("contrast", document.getElementById("contrast").value);
+            formData.append("weather", document.getElementById("weather").value);
+            formData.append("cloud_type", document.getElementById("cloud_type").value);
+            formData.append("season", document.getElementById("season").value);
+            formData.append("outdir", document.getElementById("outdir").value);
+            formData.append("all_times", document.getElementById("all_times").checked ? "true" : "false");
+
+            // Sky Gradient
+            const useSky = document.getElementById("use_sky_gradient").checked;
+            formData.append("use_sky_gradient", useSky ? "true" : "false");
+            if (useSky) {
+                formData.append("sky_col1", document.getElementById("sky_col1").value);
+                formData.append("sky_col2", document.getElementById("sky_col2").value);
+            }
+
+            // Facade Gradient
+            const facadeGrad = document.getElementById("facade_gradient").checked;
+            const facadeVal = document.getElementById("facade_slider").value;
+            formData.append("facade_gradient", facadeGrad ? "true" : "false");
+            formData.append("facade_gradient_strength", facadeGrad ? facadeVal : 0);
+
+            // God Rays
+            const godRays = document.getElementById("god_rays").checked;
+            const godRaysVal = document.getElementById("god_rays_slider").value;
+            formData.append("god_rays", godRays ? "true" : "false");
+            formData.append("god_rays_strength", godRays ? godRaysVal : 0);
+
+            // Bloom Effect
+            const bloomEnabled = document.getElementById("bloom_toggle").checked;
+            const bloomVal = document.getElementById("bloom_slider").value;
+            formData.append("bloom_strength", bloomEnabled ? bloomVal : 0);
+
+            // Interior Lighting
+            const interiorLighting = document.getElementById("interior_lighting").checked;
+            formData.append("interior_lighting", interiorLighting ? "true" : "false");
+
+            formData.append("location", document.getElementById("location").value);
+            formData.append("camera_dir", document.getElementById("camera_dir").value);
+
+            // Advanced Prompts
+            const advancedEnabled = document.getElementById("advanced_toggle").checked;
+            if (advancedEnabled) {
+                formData.append("additional_prompt", document.getElementById("additional_prompt").value);
+                formData.append("negative_prompt", document.getElementById("negative_prompt").value);
+            }
+
+            try {
+                // 1. Start Job
+                const response = await fetch("/api/render", {
+                    method: "POST",
+                    body: formData,
+                });
+                const data = await response.json();
+
+                if (data.status === "started") {
+                    const jobId = data.job_id;
+                    logStatus(`Upload complete. Job ID: ${jobId}`);
+                    progressBar.style.width = "30%";
+
+                    // 2. Open Stream
+                    const evtSource = new EventSource(`/api/stream/${jobId}`);
+                    
+                    evtSource.onmessage = function(e) {
+                        // Ignore keepalives
+                        if (e.data === ": keepalive") return;
+
+                        const msg = JSON.parse(e.data);
+                        
+                        if (msg.type === "progress") {
+                            logStatus(msg.message);
+                            // Fake progress bump
+                            let currentW = parseFloat(progressBar.style.width);
+                            if (currentW < 90) progressBar.style.width = (currentW + 5) + "%";
+                        } else if (msg.type === "complete") {
+                            logStatus("Job Complete!", "success");
+                            progressBar.style.width = "100%";
+                            evtSource.close();
+                            
+                            // Render Results
+                            displayResults(msg.data, jobId); // Pass jobId for refinement
+
+                            renderBtn.disabled = false;
+                            renderBtn.textContent = "Render";
+                            setTimeout(() => { progressContainer.style.display = "none"; }, 1000);
+                        } else if (msg.type === "error") {
+                            logStatus("Error: " + msg.message, "error");
+                            evtSource.close();
+                            renderBtn.disabled = false;
+                            renderBtn.textContent = "Render";
+                        }
+                    };
+                    
+                    evtSource.onerror = function() {
+                        logStatus("Connection lost.", "error");
+                        evtSource.close();
+                        renderBtn.disabled = false;
+                        renderBtn.textContent = "Render";
+                    };
+                } else {
+                    logStatus("Error starting job: " + data.message, "error");
+                    renderBtn.disabled = false;
+                    renderBtn.textContent = "Render";
+                }
+
+            } catch (err) {
+                logStatus("Error: " + err, "error");
+                renderBtn.disabled = false;
+                renderBtn.textContent = "Render";
+            }
+        });
+
+        // Function to display results (Slider, download, refine)
+        // Batch Queue Management
+        let batchQueue = [];
+        let queuePaused = false;
+
+        function addToBatchQueue(jobData) {
+            batchQueue.push({
+                ...jobData,
+                id: jobData.jobId || Date.now(),
+                status: 'pending',
+                progress: 0
+            });
+            updateBatchQueueUI();
         }
 
-        body {
-            font-family: system-ui, sans-serif;
-            margin: 40px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
-        }
-        h1 {
-            margin: 0 0 4px 0;
-            font-size: 32px;
-            font-weight: 600;
-        }
-        .subtitle {
-            margin: 0 0 16px 0;
-            font-size: 12px;
-            color: var(--subtitle-color);
-        }
-        .control-row {
-            margin-bottom: 8px;
-        }
-        input, select, textarea {
-            background-color: var(--input-bg);
-            color: var(--input-text);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 4px;
-        }
-        .dropzone {
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
-            padding: 40px;
-            text-align: center;
-            color: var(--dropzone-text);
-            background-color: var(--dropzone-bg);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .dropzone.dragover {
-            border-color: var(--dropzone-hover-border);
-            background: var(--dropzone-hover-bg);
-        }
-        /* Thumbnail styling */
-        .preview-container {
-            margin-top: 20px;
-        }
-        .preview-image {
-            max-width: 100%;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        function updateBatchQueueUI() {
+            const container = document.getElementById('queue-items');
+            const queueDiv = document.getElementById('batch-queue');
+            if (!container || !queueDiv) return;
+            
+            if (batchQueue.length === 0) {
+                queueDiv.style.display = 'none';
+                return;
+            }
+            
+            queueDiv.style.display = 'block';
+            container.innerHTML = batchQueue.map((item, idx) => `
+                <div class="queue-item" data-queue-id="${item.id}">
+                    <div class="queue-item-header">
+                        <span>#${idx + 1} - ${item.filename || 'Render'}</span>
+                        <span class="queue-status queue-status-${item.status}">${item.status}</span>
+                    </div>
+                    <div class="queue-progress">
+                        <div class="queue-progress-bar" style="width: ${item.progress}%"></div>
+                    </div>
+                    <div class="queue-actions">
+                        <button onclick="removeFromQueue('${item.id}')" class="btn-small btn-danger">Remove</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        /* SLIDER STYLING */
-        img-comparison-slider {
-            width: 100%;
-            max-width: 1200px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            margin-bottom: 24px;
-            --divider-width: 2px;
-            --divider-color: #ffffff;
-            --default-handle-width: 50px;
-        }
-        img-comparison-slider img {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: contain;
-        }
-        /* Custom handle styling */
-        .slider-handle {
-            background: white;
-            color: #333;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        function pauseQueue() {
+            queuePaused = true;
+            document.getElementById('pause-queue-btn').style.display = 'none';
+            document.getElementById('resume-queue-btn').style.display = 'inline-block';
         }
 
-        /* Professional Button Styles - Consistent Sizing */
-        .btn-primary {
-            padding: 10px 24px;
-            font-size: 14px;
-            font-weight: 500;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            min-width: 160px;
-            justify-content: center;
-            height: 42px;
-            box-sizing: border-box;
-        }
-        
-        /* Small buttons for gallery/presets */
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 13px;
-            font-weight: 500;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            min-width: 100px;
-            justify-content: center;
-            height: 36px;
-            box-sizing: border-box;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        /* Professional Color Scheme - All Buttons */
-        .btn-primary-main {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-        }
-        
-        .btn-primary-main:hover {
-            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
-        }
-        
-        .btn-primary-secondary {
-            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
-            color: white;
-        }
-        
-        .btn-primary-secondary:hover {
-            background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 100%);
-        }
-        
-        .btn-primary-tertiary {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-            color: white;
-        }
-        
-        .btn-primary-tertiary:hover {
-            background: linear-gradient(135deg, #475569 0%, #64748b 100%);
-        }
-        
-        /* Small button colors */
-        .btn-small {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-            color: white;
-        }
-        
-        .btn-small:hover {
-            background: linear-gradient(135deg, #475569 0%, #64748b 100%);
-        }
-        
-        .btn-small.btn-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-        }
-        
-        .btn-small.btn-danger:hover {
-            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-        }
-        
-        [data-theme="dark"] .btn-primary-tertiary {
-            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-            color: white;
-        }
-        
-        [data-theme="dark"] .btn-primary-tertiary:hover {
-            background: linear-gradient(135deg, #475569 0%, #64748b 100%);
+        function resumeQueue() {
+            queuePaused = false;
+            document.getElementById('pause-queue-btn').style.display = 'inline-block';
+            document.getElementById('resume-queue-btn').style.display = 'none';
         }
 
-        #renderBtn, #mashupBtn {
-            margin-top: 12px;
-            font-weight: 600;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-        }
-        h3 {
-            margin-top: 24px;
-        }
-        /* Progress bar */
-        #progressContainer {
-            width: 100%;
-            max-width: 400px;
-            height: 10px;
-            background-color: #eee;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-top: 10px;
-            display: none;
-        }
-        #progressBar {
-            height: 100%;
-            width: 0%;
-            background-color: #4caf50;
-            transition: width 0.3s ease;
-        }
-        /* Status Console Box */
-        #status-console {
-            margin-top: 15px;
-            padding: 10px;
-            background: var(--status-console-bg);
-            color: var(--status-console-text);
-            font-family: monospace;
-            font-size: 13px;
-            border-radius: 4px;
-            border: 1px solid var(--border-color);
-            display: none; /* Hidden by default */
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        .status-line { margin: 2px 0; }
-        .status-line.error { color: #e74c3c; font-weight: bold; }
-        .status-line.success { color: #2ecc71; font-weight: bold; }
-        
-        .mashup-options label {
-            margin-right: 8px;
+        function clearQueue() {
+            if (confirm('Clear all items from queue?')) {
+                batchQueue = [];
+                updateBatchQueueUI();
+            }
         }
 
-        /* Mashup specific dropzone tweaks */
-        .mashup-dropzone {
-            padding: 20px !important;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            background: var(--mashup-bg);
+        function removeFromQueue(id) {
+            batchQueue = batchQueue.filter(item => item.id !== id);
+            updateBatchQueueUI();
         }
-        .mashup-dropzone p { margin: 0; font-size: 14px; pointer-events: none; }
-        .thumb-preview {
-            max-height: 80px;
-       
 
-[TRUNCATED - Original file was 172752 characters, showing first 12000 characters]
+        function displayResults(data, jobId) {
+            const images = data.images;
+            const settings = data.settings || {}; // Capture the settings used
+
+            images.forEach(imgData => {
+                if (imgData.error) {
+                    const errDiv = document.createElement("div");
+                    errDiv.style.color = "red";
+                    errDiv.innerText = `Error (${imgData.lighting}): ${imgData.error}`;
+                    renderPreview.appendChild(errDiv);
+                    return;
+                }
+
+                // Wrapper
+                const wrapper = document.createElement("div");
+                wrapper.className = "preview-container";
+                
+                const title = document.createElement("h4");
+                title.innerText = `${imgData.lighting} mode ($${imgData.cost_usd || '?'})`;
+                wrapper.appendChild(title);
+
+                // --- NEW: Comparison Slider Component ---
+                const sliderComp = document.createElement("img-comparison-slider");
+                
+                // Original Image (Left) - use the specific endpoint
+                const imgLeft = document.createElement("img");
+                imgLeft.slot = "first";
+                // We need to know the original filename. The backend sends "original_name".
+                // We serve inputs from /input/<filename>
+                imgLeft.src = `/input/${imgData.original_name}`;
+                
+                // Generated Image (Right)
+                const imgRight = document.createElement("img");
+                imgRight.slot = "second";
+                imgRight.src = `/${imgData.image}`; // Backend sends relative path like "output/..."
+                
+                // Custom Handle
+                const handle = document.createElement("div");
+                handle.slot = "handle";
+                handle.className = "slider-handle";
+                // Font Awesome icon
+                handle.innerHTML = '<i class="fa-solid fa-arrows-left-right"></i>';
+
+                sliderComp.appendChild(imgLeft);
+                sliderComp.appendChild(imgRight);
+                sliderComp.appendChild(handle);
+                wrapper.appendChild(sliderComp);
+
+                // --- Reuse Settings Button ---
+                const reuseBtn = document.createElement("button");
+                reuseBtn.className = "btn-secondary";
+                reuseBtn.innerText = "♻️ Reuse Settings";
+                reuseBtn.onclick = () => applySettingsToForm(settings);
+                reuseBtn.style.marginTop = "10px";
+                reuseBtn.style.width = "100%";
+                wrapper.appendChild(reuseBtn);
+
+                // --- Download Button ---
+                const dlBtn = document.createElement("a");
+                dlBtn.href = `/${imgData.image}`;
+                dlBtn.download = ""; // auto name
+                dlBtn.innerHTML = '<i class="fa-solid fa-download"></i> Download Full Image';
+                dlBtn.className = "btn-primary btn-primary-tertiary";
+                dlBtn.style.display = "block";
+                dlBtn.style.marginBottom = "10px";
+                wrapper.appendChild(dlBtn);
+
+                // --- Refine Section ---
+                const refineBox = document.createElement("div");
+                refineBox.className = "refine-box";
+                
+                const refineLabel = document.createElement("h5");
+                refineLabel.innerText = "💬 Refine this result";
+                refineLabel.style.marginTop = "0";
+                refineBox.appendChild(refineLabel);
+
+                const textArea = document.createElement("textarea");
+                textArea.className = "refine-textarea";
+                textArea.placeholder = "e.g. Make the lights warmer, reduce the fog, remove the cars...";
+                refineBox.appendChild(textArea);
+
+                const refineBtn = document.createElement("button");
+                refineBtn.className = "btn-primary btn-primary-main";
+                refineBtn.innerHTML = '<i class="fa-solid fa-magic"></i> Refine';
+                refineBtn.onclick = () => runRefine(jobId, textArea.value, refineBox, "/" + imgData.image);
+                refineBox.appendChild(refineBtn);
+
+                // --- In-Paint Section ---
+                const inpaintBox = document.createElement("div");
+                inpaintBox.className = "refine-box";
+                inpaintBox.style.marginTop = "15px";
+                inpaintBox.style.borderTop = "1px solid #ddd";
+                inpaintBox.style.paddingTop = "10px";
+
+                const inpaintLabel = document.createElement("label");
+                inpaintLabel.style.display = "block";
+                inpaintLabel.style.marginBottom = "5px";
+                inpaintLabel.style.fontWeight = "bold";
+                inpaintLabel.innerHTML = '<i class="fa-solid fa-paintbrush"></i> In-Paint (Draw Mask)';
+                inpaintBox.appendChild(inpaintLabel);
+
+                const instructionText = document.createElement("p");
+                instructionText.style.fontSize = "12px";
+                instructionText.style.color = "var(--subtitle-color)";
+                instructionText.style.marginBottom = "10px";
+                instructionText.style.marginTop = "0";
+                instructionText.innerHTML = "💡 Draw on the image below to mark areas for editing (white = edit, black = preserve)";
+                inpaintBox.appendChild(instructionText);
+
+                // Create canvas drawing area
+                const canvasContainer = document.createElement("div");
+                canvasContainer.style.position = "relative";
+                canvasContainer.style.marginBottom = "10px";
+                canvasContainer.style.border = "2px solid var(--border-color)";
+                canvasContainer.style.borderRadius = "8px";
+                canvasContainer.style.overflow = "hidden";
+                canvasContainer.style.backgroundColor = "#000";
+                canvasContainer.id = `canvas-container-${jobId}`;
+
+                // Preview image
+                const previewImg = document.createElement("img");
+                previewImg.src = "/" + imgData.image;
+                previewImg.style.width = "100%";
+                previewImg.style.height = "auto";
+                previewImg.style.display = "block";
+                previewImg.id = `preview-img-${jobId}`;
+                previewImg.onload = function() {
+                    const canvas = document.getElementById(`mask-canvas-${jobId}`);
+                    if (canvas) {
+                        canvas.width = this.naturalWidth;
+                        canvas.height = this.naturalHeight;
+                        canvas.style.width = "100%";
+                        canvas.style.height = "auto";
+                    }
+                };
+                canvasContainer.appendChild(previewImg);
+
+                // Canvas for drawing mask
+                const maskCanvas = document.createElement("canvas");
+                maskCanvas.id = `mask-canvas-${jobId}`;
+                maskCanvas.style.position = "absolute";
+                maskCanvas.style.top = "0";
+                maskCanvas.style.left = "0";
+                maskCanvas.style.width = "100%";
+                maskCanvas.style.height = "100%";
+                maskCanvas.style.cursor = "crosshair";
+                maskCanvas.style.opacity = "0.5";
+                canvasContainer.appendChild(maskCanvas);
+
+                // Drawing tools
+                const toolsDiv = document.createElement("div");
+                toolsDiv.className = "drawing-tools";
+
+                // Brush button
+                const brushBtn = document.createElement("button");
+                brushBtn.className = "btn-small";
+                brushBtn.innerHTML = '<i class="fa-solid fa-paintbrush"></i> Brush';
+                brushBtn.id = `brush-btn-${jobId}`;
+                brushBtn.style.backgroundColor = "#6366f1";
+                brushBtn.style.color = "white";
+                toolsDiv.appendChild(brushBtn);
+
+                // Eraser button
+                const eraserBtn = document.createElement("button");
+                eraserBtn.className = "btn-small";
+                eraserBtn.innerHTML = '<i class="fa-solid fa-eraser"></i> Eraser';
+                eraserBtn.id = `eraser-btn-${jobId}`;
+                toolsDiv.appendChild(eraserBtn);
+
+                // Clear button
+                const clearBtn = document.createElement("button");
+                clearBtn.className = "btn-small";
+                clearBtn.innerHTML = '<i class="fa-solid fa-trash"></i> Clear';
+                clearBtn.id = `clear-btn-${jobId}`;
+                toolsDiv.appendChild(clearBtn);
+
+                // Brush size slider
+                const sizeLabel = document.createElement("label");
+                sizeLabel.style.marginLeft = "10px";
+                sizeLabel.style.fontSize = "12px";
+                sizeLabel.innerHTML = 'Brush Size: <span id="brush-size-val-' + jobId + '">20</span>px';
+                toolsDiv.appendChild(sizeLabel);
+
+                const sizeSlider = document.createElement("input");
+                sizeSlider.type = "range";
+                sizeSlider.min = "5";
+                sizeSlider.max = "100";
+                sizeSlider.value = "20";
+                sizeSlider.style.width = "100px";
+                sizeSlider.id = `brush-size-${jobId}`;
+                sizeSlider.oninput = function() {
+                    document.getElementById(`brush-size-val-${jobId}`).textContent = this.value;
+                };
+                toolsDiv.appendChild(sizeSlider);
+
+                inpaintBox.appendChild(toolsDiv);
+                inpaintBox.appendChild(canvasContainer);
+
+                // Initialize canvas drawing
+                let isDrawing = false;
+                let currentTool = 'brush';
+                let brushSize = 20;
+
+                function initCanvas() {
+                    const img = previewImg;
+                    if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+                        // Image not loaded yet, wait
+                        setTimeout(initCanvas, 100);
+                        return;
+                    }
+                    
+                    // Set canvas to match image dimensions
+                    maskCanvas.width = img.naturalWidth;
+                    maskCanvas.height = img.naturalHeight;
+                    
+                    // Set canvas display size to match image display size
+                    const imgRect = img.getBoundingClientRect();
+                    maskCanvas.style.width = imgRect.width + "px";
+                    maskCanvas.style.height = imgRect.height + "px";
+                    
+                    const ctx = maskCanvas.getContext('2d');
+                    ctx.fillStyle = 'white';
+                    ctx.strokeStyle = 'white';
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.globalCompositeOperation = 'source-over';
+                }
+
+                function updateCanvasDisplaySize() {
+                    if (maskCanvas.width === 0 || maskCanvas.height === 0) return;
+                    const imgRect = previewImg.getBoundingClientRect();
+                    maskCanvas.style.width = imgRect.width + "px";
+                    maskCanvas.style.height = imgRect.height + "px";
+                }
+
+                previewImg.onload = function() {
+                    initCanvas();
+                    updateCanvasDisplaySize();
+                };
+                if (previewImg.complete) {
+                    initCanvas();
+                    setTimeout(updateCanvasDisplaySize, 100);
+                }
+                
+                // Update canvas display size on window resize
+                const resizeObserver = new ResizeObserver(() => {
+                    updateCanvasDisplayS
+
+[TRUNCATED - Excerpt was 132872 characters, showing first 30,000 characters]
 ```
-
-*Note: File content truncated to 12,000 characters*
 
 ### .env
 

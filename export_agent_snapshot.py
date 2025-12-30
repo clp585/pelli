@@ -420,6 +420,97 @@ def read_file_content(file_path: Path, project_root: Path, max_length: int = DEF
         return f"[ERROR READING FILE: {rel_path} - {e}]", False
 
 
+def extract_html_js_excerpt(html_content: str) -> str:
+    """
+    Extract JavaScript code (script tags) and key HTML elements (IDs/classes used by JS)
+    from templates/index.html for the snapshot.
+    
+    Returns a formatted excerpt containing all script tags and HTML elements with key IDs.
+    """
+    import re
+    output = []
+    output.append("<!-- JavaScript Excerpt (script tags and key HTML elements) -->")
+    output.append("")
+    
+    # Extract all script tags (including content)
+    script_pattern = r'<script[^>]*>.*?</script>'
+    scripts = re.findall(script_pattern, html_content, re.DOTALL | re.IGNORECASE)
+    
+    if scripts:
+        output.append("<!-- ========== JavaScript Code ========== -->")
+        output.append("")
+        for i, script in enumerate(scripts, 1):
+            output.append(f"<!-- Script block {i} -->")
+            output.append(script)
+            output.append("")
+    
+    # Key IDs that are referenced in JavaScript
+    key_ids = [
+        'renderBtn', 'previewBtn', 'progressContainer', 'progressBar', 'status-console',
+        'dropzone', 'fileInput', 'estimate', 'selectedPreview', 'renderPreview',
+        'mashupBtn', 'mashupStatus', 'mashupPreview', 'mashupResolution', 'mashupCost',
+        'mapModal', 'openMapBtn', 'confirmLocBtn', 'location',
+        'use_sky_gradient', 'sky_col1', 'sky_col2', 'advanced_toggle', 'advanced_container',
+        'facade_gradient', 'facade_container', 'cost-period', 'costs-container',
+        'batch-queue', 'queue-items', 'pause-queue-btn', 'resume-queue-btn'
+    ]
+    
+    output.append("<!-- ========== Key HTML Elements (IDs referenced in JS) ========== -->")
+    output.append("")
+    
+    # Extract elements with these IDs using a more robust approach
+    for element_id in key_ids:
+        # Pattern to match opening tag with id attribute
+        id_pattern = rf'id=["\']?{re.escape(element_id)}["\']?'
+        # Find the position of the opening tag
+        matches = list(re.finditer(id_pattern, html_content, re.IGNORECASE))
+        
+        for match in matches:
+            # Find the start of the tag (look backwards for <)
+            start_pos = match.start()
+            tag_start = html_content.rfind('<', 0, start_pos)
+            if tag_start == -1:
+                continue
+            
+            # Find the end of the opening tag
+            tag_end = html_content.find('>', start_pos)
+            if tag_end == -1:
+                continue
+            
+            # Extract the tag name
+            tag_match = re.match(r'<(\w+)', html_content[tag_start:tag_start+50])
+            if not tag_match:
+                continue
+            
+            tag_name = tag_match.group(1)
+            opening_tag = html_content[tag_start:tag_end+1]
+            
+            # Check if it's a self-closing tag
+            if opening_tag.rstrip().endswith('/>') or tag_name.lower() in ['img', 'input', 'br', 'hr', 'meta', 'link']:
+                output.append(f"<!-- Element with id='{element_id}' -->")
+                output.append(opening_tag)
+                output.append("")
+            else:
+                # Find the matching closing tag
+                remaining = html_content[tag_end+1:]
+                closing_pattern = rf'</{re.escape(tag_name)}>'
+                closing_match = re.search(closing_pattern, remaining, re.IGNORECASE)
+                
+                if closing_match:
+                    full_element = html_content[tag_start:tag_end+1+closing_match.end()]
+                    output.append(f"<!-- Element with id='{element_id}' -->")
+                    output.append(full_element)
+                    output.append("")
+                else:
+                    # Single line element (fallback)
+                    output.append(f"<!-- Element with id='{element_id}' -->")
+                    output.append(opening_tag)
+                    output.append("")
+            break  # Only take first match per ID
+    
+    return '\n'.join(output)
+
+
 def redact_env_file(file_path: Path) -> str:
     """Read .env file and redact values, keeping keys."""
     if not file_path.exists():
@@ -496,9 +587,19 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
     
     sections = []
     
-    # === Build Identity ===
+    # === Title ===
     sections.append("# Project Snapshot")
     sections.append("")
+    
+    # === How to use this snapshot ===
+    sections.append("## How to use this snapshot")
+    sections.append("")
+    sections.append("- **For UI changes:** paste the `templates/index.html (JS excerpt)` section")
+    sections.append("- **For backend changes:** paste API Inventory + the relevant route excerpt")
+    sections.append("- **For new controls:** paste Options Schema")
+    sections.append("")
+    
+    # === Build Identity ===
     sections.append("## Build Identity")
     sections.append("")
     sections.append("**Generated (Timestamp):** " + timestamp)
@@ -567,6 +668,69 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
         sections.append("*No routes found or error parsing app.py*")
         sections.append("")
     
+    # === Job Streaming Protocol ===
+    sections.append("## Job Streaming Protocol")
+    sections.append("")
+    sections.append("### Endpoint")
+    sections.append("")
+    sections.append("`GET /api/stream/<job_id>` - Server-Sent Events (SSE) endpoint for streaming job status updates.")
+    sections.append("")
+    sections.append("### Event Types")
+    sections.append("")
+    sections.append("Jobs emit three types of events via the queue:")
+    sections.append("")
+    sections.append("#### 1. Progress Events")
+    sections.append("")
+    sections.append("```json")
+    sections.append('{"type": "progress", "message": "[filename.jpg | night] 🚀 Starting render..."}')
+    sections.append("```")
+    sections.append("")
+    sections.append("**Client behavior**: Update status text/log, continue polling.")
+    sections.append("")
+    sections.append("#### 2. Complete Events")
+    sections.append("")
+    sections.append("Render job completion:")
+    sections.append("```json")
+    sections.append('{"type": "complete", "data": {"status": "success", "images": [...], "total_cost_usd": 0.20, "settings": {...}}}')
+    sections.append("```")
+    sections.append("")
+    sections.append("Refine/Inpaint/Preview completion:")
+    sections.append("```json")
+    sections.append('{"type": "complete", "data": {"status": "success", "image": "/output/path.jpg", "cost_usd": 0.05}}')
+    sections.append("```")
+    sections.append("")
+    sections.append("**Client behavior**: Render results (images/data), stop polling/stream, close EventSource.")
+    sections.append("")
+    sections.append("#### 3. Error Events")
+    sections.append("")
+    sections.append("```json")
+    sections.append('{"type": "error", "message": "Job failed: error description"}')
+    sections.append("```")
+    sections.append("")
+    sections.append("**Client behavior**: Display error message, stop polling/stream, close EventSource.")
+    sections.append("")
+    sections.append("### Notes")
+    sections.append("")
+    sections.append("- Stream closes automatically after `complete` or `error` events.")
+    sections.append("- Keepalive comments (`: keepalive`) are sent every 30s to maintain connection.")
+    sections.append("- Job queue expires after 1 hour (TTL).")
+    sections.append("")
+    
+    # === Static File Serving ===
+    sections.append("## Static File Serving (Inputs/Outputs)")
+    sections.append("")
+    sections.append("### Routes")
+    sections.append("")
+    sections.append("| Route | Serves From | Purpose |")
+    sections.append("|-------|-------------|---------|")
+    sections.append("| `/input/<path:filename>` | `input/` (upload folder) | Original uploaded images for before/after comparison slider |")
+    sections.append("| `/output/<path:filename>` | `output/` (output folder) | Generated result images displayed in the UI |")
+    sections.append("")
+    sections.append("**Usage notes:**")
+    sections.append("- `/input/` serves original uploaded images (stored in `UPLOAD_FOLDER`).")
+    sections.append("- `/output/` serves generated/processed images (stored in `OUTPUT_FOLDER`).")
+    sections.append("")
+    
     # === Options Schema ===
     sections.append("## Options Schema")
     sections.append("")
@@ -593,11 +757,11 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
     
     for file_rel_path in KEY_FILES:
         file_path = project_root / file_rel_path
-        sections.append(f"### {file_rel_path}")
-        sections.append("")
         
         if file_path.exists():
             if file_rel_path == '.env' or file_path.name == '.env':
+                sections.append(f"### {file_rel_path}")
+                sections.append("")
                 content = redact_env_file(file_path)
                 sections.append("```")
                 sections.append(content)
@@ -605,7 +769,26 @@ def generate_snapshot(project_root: Path = DEFAULT_PROJECT_ROOT, max_file_length
                 sections.append("")
                 sections.append("*Note: .env values have been redacted for security*")
                 sections.append("")
+            elif file_rel_path == 'templates/index.html':
+                # Special handling for templates/index.html: extract JS and key HTML elements
+                sections.append("### templates/index.html (JS excerpt)")
+                sections.append("")
+                try:
+                    html_content = file_path.read_text(encoding='utf-8', errors='replace')
+                    content = extract_html_js_excerpt(html_content)
+                    # Cap at 30,000 chars as per requirement
+                    if len(content) > 30000:
+                        content = content[:30000] + f"\n\n[TRUNCATED - Excerpt was {len(content)} characters, showing first 30,000 characters]"
+                    sections.append("```html")
+                    sections.append(content)
+                    sections.append("```")
+                    sections.append("")
+                except Exception as e:
+                    sections.append(f"*Error extracting JS excerpt: {e}*")
+                    sections.append("")
             else:
+                sections.append(f"### {file_rel_path}")
+                sections.append("")
                 content, was_truncated = read_file_content(file_path, project_root, max_file_length)
                 # Replace any absolute paths in content with <REPO_ROOT>
                 project_root_str = str(project_root_resolved)
@@ -729,6 +912,7 @@ def main():
         print("  - Build Identity (timestamp, path)")
         print("  - Repo Tree (structure)")
         print("  - API Inventory (Flask routes)")
+        print("  - Job Streaming Protocol (SSE event schema)")
         print("  - Options Schema (render API options)")
         print(f"  - Key Files (truncated to {max_file_length:,} chars)")
         print("  - Notes/TODO (from code and docs)")
