@@ -20,7 +20,7 @@ Standard wiring pattern used in this project:
 
 ## Build Identity
 
-**Generated (Timestamp):** 2025-12-30 15:21:36
+**Generated (Timestamp):** 2025-12-30 15:26:57
 **Source Path:** <REPO_ROOT>
 
 ## Repo Tree
@@ -631,7 +631,7 @@ def process_refine_job(new_job_id, original_job_id, feedback):
                     resolution=original_entry.get("resolution", "4K"),
             
 
-[TRUNCATED - Original file was 41820 characters, showing first 12000 characters]
+[TRUNCATED - Original file was 42574 characters, showing first 12000 characters]
 ```
 
 *Note: File content truncated to 12,000 characters*
@@ -1464,10 +1464,12 @@ const dropzone = document.getElementById("dropzone");
                             if (msg.data && msg.data.video) {
                                 // Normalize path to ensure it starts with /
                                 const videoPath = normalizeOutputPath(msg.data.video);
-                                // Use artifact_type if present, otherwise infer from file extension
+                                // Use artifact_type if present (backend should always emit this)
+                                // Fallback inference is only for backward compatibility during transition
                                 let artifactType = msg.data.artifact_type;
                                 if (!artifactType) {
-                                    // Fallback: infer from file extension (resilient during Option B transition)
+                                    // Backward compatibility: infer from file extension if artifact_type missing
+                                    // TODO: Remove this fallback once backend contract is guaranteed
                                     artifactType = videoPath.toLowerCase().endsWith('.mp4') ? 'video' : 'file';
                                 }
                                 
@@ -1683,14 +1685,9 @@ const dropzone = document.getElementById("dropzone");
                 const inpaintBox = document.createElement("div");
                 inpaintBox.className = "refine-box";
                 inpaintBox.style.marginTop = "15px";
-                inpaintBox.style.borderTop = "1px solid #ddd";
-                inpaintBox.style.paddingTop = "10px";
+                inpaintBox.style.borderTop = "1px solid
 
-                const inpaintLabel = document.createElement("label");
-                inpaintLabel.style.display = "block";
-                inp
-
-[TRUNCATED - Excerpt was 140086 characters, showing first 30,000 characters]
+[TRUNCATED - Excerpt was 140292 characters, showing first 30,000 characters]
 ```
 
 ### .env

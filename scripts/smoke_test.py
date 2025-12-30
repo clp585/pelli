@@ -154,7 +154,17 @@ def test_video_contract():
             print(f"FAIL: complete.data.artifact_type has unexpected value: {artifact_type}")
             return False
         
-        print(f"PASS: /api/video contract verified (video={video_url}, artifact_type={artifact_type})")
+        # Assert contract: complete.data.cost_usd is present
+        if 'cost_usd' not in data:
+            print("FAIL: complete.data missing 'cost_usd' field")
+            return False
+        
+        cost_usd = data['cost_usd']
+        if not isinstance(cost_usd, (int, float)) or cost_usd < 0:
+            print(f"FAIL: complete.data.cost_usd has invalid value: {cost_usd}")
+            return False
+        
+        print(f"PASS: /api/video contract verified (video={video_url}, artifact_type={artifact_type}, cost_usd={cost_usd})")
         return True
 
 def main():

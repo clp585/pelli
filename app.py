@@ -564,9 +564,22 @@ def process_video_job(job_id, image_path, options):
             job_id=job_id,
         )
         
-        # Build public URL from filename (always /output/<filename>)
-        # This avoids OS path separator issues and keeps the contract clean.
-        video_url = f"/output/{video_filename}"
+        # Normalize to canonical /output/<filename> URL format
+        # Handles cases: "filename.txt", "output/filename.txt", "/output/filename.txt", or absolute paths
+        # This ensures data.video always starts with /output/ per the canonical public path contract
+        if video_filename.startswith('/output/'):
+            # Already in correct format
+            video_url = video_filename
+        elif video_filename.startswith('output/'):
+            # Missing leading slash
+            video_url = f"/{video_filename}"
+        elif os.path.isabs(video_filename) or os.sep in video_filename or (os.altsep and os.altsep in video_filename):
+            # Absolute path or contains path separators - extract just the filename
+            filename = os.path.basename(video_filename)
+            video_url = f"/output/{filename}"
+        else:
+            # Just a filename (expected case)
+            video_url = f"/output/{video_filename}"
         
         # Determine artifact type and MIME type based on filename extension
         artifact_type = 'video' if video_filename.endswith('.mp4') else 'file'
